@@ -8,4 +8,6 @@ github_repos:
   - GeeeHesso/PowerData
   - gillioz/CoBooM-2d
   - gillioz/QuasiPrimaryData
+  - gillioz/TemperateOptimalPowerFlow.jl
+  - GeeeHesso/AramisAPI.jl
   

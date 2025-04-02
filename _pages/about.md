@@ -1,17 +1,14 @@
 ---
 layout: about
-title: about
+title: About
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. Address. Contacts. Motto. Etc.
-
+subtitle: >
+  Senior scientist, <a href='https://etranselec.ch/'>Electrical Energy Efficiency Group</a>,
+  <a href='https://www.hevs.ch/'>HES-SO Valais-Wallis</a>
 profile:
   align: right
   image: Portrait_oct_2023.jpg
-  image_circular: true # crops the image to make it circular
-  more_info: >
-    <p>555 your office number</p>
-    <p>123 your address street</p>
-    <p>Your City, State 12345</p>
+  image_circular: true
 
 selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
@@ -19,16 +16,25 @@ social: true # includes social icons at the bottom of the page
 announcements:
   enabled: true # includes a list of news items
   scrollable: true # adds a vertical scroll bar if there are more than 3 news items
-  limit: 5 # leave blank to include all the news in the `_news` folder
+  limit: 3 # leave blank to include all the news in the `_news` folder
 
-latest_posts:
-  enabled: true
-  scrollable: true # adds a vertical scroll bar if there are more than 3 new posts items
-  limit: 3 # leave blank to include all the blog posts
 ---
 
-Write your biography here. Tell the world about yourself. Link to your favorite [subreddit](http://reddit.com). You can put a picture in, too. The code is already in, just name your picture `prof_pic.jpg` and put it in the `img/` folder.
+I am a theoretical physicist with industry experience in software development. I am currently employed as senior scientist at the <a href='https://www.hevs.ch/'>HES-SO Valais-Wallis</a>, in my home town of <a href='https://goo.gl/maps/2KSLcLG25jX94kfU9'>Sion, Switzerland</a>.
 
-Put your address / P.O. box / other info right below your picture. You can also disable any of these elements by editing `profile` property of the YAML header of your `_pages/about.md`. Edit `_bibliography/papers.bib` and Jekyll will render your [publications page](/al-folio/publications/) automatically.
+My research interests are in three domains:
 
-Link to your social media connections, too. This theme is set up to use [Font Awesome icons](https://fontawesome.com/) and [Academicons](https://jpswalsh.github.io/academicons/), like the ones below. Add your Facebook, Twitter, LinkedIn, Google Scholar, or just disable all of them.
+
+### Power grids
+
+...
+
+### Machine learning
+
+...
+
+### High-energy physics
+
+I originally graduated in high-energy physics, with a Ph.D. thesis on the Higgs boson and the possibility that it is a composite particle. After that I was a postdoc at the [University of Southern Denmark](https://www.linkedin.com/company/cp3-origins-sdu/), at [UC Davis](https://qmap.ucdavis.edu/) (USA), [EPFL](https://www.epfl.ch/labs/lptp/) (Switzerland), and at [SISSA](https://www.sissa.it/) (Italy). I became an expert in [conformal field theory](https://en.wikipedia.org/wiki/Conformal_field_theory), a special case of [quantum field theory](https://en.wikipedia.org/wiki/Quantum_field_theory) with [scale invariance](https://en.wikipedia.org/wiki/Scale_invariance) in which we have a decent (and growing) understanding of the strong-coupling regime.
+
+

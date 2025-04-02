@@ -8,7 +8,22 @@
       "city": "Sion",
       "countryCode": "CH",
       "region": "VS"
-    }
+    },
+    "profiles": [
+    {
+      "network": "LinkedIn",
+      "url": "https://www.linkedin.com/in/marc-gillioz-94bb716/"
+    },
+    {
+   	  "network": "Bluesky",
+   	  "username": "@mgillioz.bsky.social",
+   	  "url": "https://bsky.app/profile/mgillioz.bsky.social"
+    },
+    {
+      "network": "Mastodon",
+      "username": "@MarcGillioz@mathstodon.xyz",
+      "url": "https://mathstodon.xyz/@MarcGillioz"
+    }]
   },
   "work": [
     {
@@ -28,8 +43,7 @@
       "url": "https://www.scs.ch/",
       "startDate": "2022-07",
       "endDate": "2023-04",
-      "summary": "Researcher in the Electrical Energy Efficiency Group",
-      "highlights": ["Software engineering in C#/.NET", "Azure cloud"]
+      "highlights": ["C#/.NET", "Terraform", "Azure cloud"]
     },
     {
       "name": "SISSA",
@@ -38,23 +52,23 @@
       "url": "https://www.sissa.it/",
       "startDate": "2019-07",
       "endDate": "2022-05",
-      "highlights": ["Conformal field theory"]
+      "highlights": ["Conformal field theory", "Mathematical physics"]
     },
     {
       "name": "EPFL",
       "location": "Lausanne, Switzerland",
       "position": "Postdoctoral researcher",
       "url": "https://www.epfl.ch/labs/lptp",
-      "startDate": "2019-06",
-      "endDate": "2016-10"
+      "startDate": "2016-10",
+      "endDate": "2019-06"
     },
     {
       "name": "UC Davis",
       "location": "Davis, CA, USA",
       "position": "Postdoctoral researcher",
-      "url": "https://https://qmap.ucdavis.edu/",
+      "url": "https://qmap.ucdavis.edu/",
       "startDate": "2014-10",
-      "endDate": "2016-03"
+      "endDate": "2016-06"
     },
     {
       "name": "University of Southern Denmark",
@@ -106,16 +120,43 @@
   "skills": [
   	{
       "name": "Software",
-      "icon": "fa-solid fa-hashtag",
+      "icon": "fa-solid fa-code",
       "keywords": [
-        "C# / .NET"
+        "C# / .NET",
+        "C++",
+        "Python",
+        "DevOps"
+      ]
+    },
+    {
+      "name": "Scientific computing",
+      "icon": "fa-solid fa-computer",
+      "keywords": [
+        "Julia",
+        "Mathematica"
+      ]
+    },
+    {
+      "name": "Machine learning",
+      "icon": "fa-solid fa-database",
+      "keywords": [
+        "PyTorch",
+        "scikit-learn"
       ]
     },
     {
       "name": "Physics",
-      "icon": "fa-solid fa-hashtag",
+      "icon": "fa-solid fa-atom",
       "keywords": [
-        "Quantum field theory"
+        "Quantum field theory",
+        "Particle physics"
+      ]
+    },
+    {
+      "name": "Electrical engineering",
+      "icon": "fa-solid fa-bolt",
+      "keywords": [
+        "Power grids"
       ]
     }
   ],
