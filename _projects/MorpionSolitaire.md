@@ -7,4 +7,3 @@ redirect: https://gillioz.github.io/MorpionSolitaireBlog
 importance: 3
 category: "Machine learning"
 ---
-

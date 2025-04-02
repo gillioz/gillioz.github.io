@@ -10,20 +10,21 @@
       "region": "VS"
     },
     "profiles": [
-    {
-      "network": "LinkedIn",
-      "url": "https://www.linkedin.com/in/marc-gillioz-94bb716/"
-    },
-    {
-   	  "network": "Bluesky",
-   	  "username": "@mgillioz.bsky.social",
-   	  "url": "https://bsky.app/profile/mgillioz.bsky.social"
-    },
-    {
-      "network": "Mastodon",
-      "username": "@MarcGillioz@mathstodon.xyz",
-      "url": "https://mathstodon.xyz/@MarcGillioz"
-    }]
+      {
+        "network": "LinkedIn",
+        "url": "https://www.linkedin.com/in/marc-gillioz-94bb716/"
+      },
+      {
+        "network": "Bluesky",
+        "username": "@mgillioz.bsky.social",
+        "url": "https://bsky.app/profile/mgillioz.bsky.social"
+      },
+      {
+        "network": "Mastodon",
+        "username": "@MarcGillioz@mathstodon.xyz",
+        "url": "https://mathstodon.xyz/@MarcGillioz"
+      }
+    ]
   },
   "work": [
     {
@@ -118,46 +119,30 @@
     }
   ],
   "skills": [
-  	{
+    {
       "name": "Software",
       "icon": "fa-solid fa-code",
-      "keywords": [
-        "C# / .NET",
-        "C++",
-        "Python",
-        "DevOps"
-      ]
+      "keywords": ["C# / .NET", "C++", "Python", "DevOps"]
     },
     {
       "name": "Scientific computing",
       "icon": "fa-solid fa-computer",
-      "keywords": [
-        "Julia",
-        "Mathematica"
-      ]
+      "keywords": ["Julia", "Mathematica"]
     },
     {
       "name": "Machine learning",
       "icon": "fa-solid fa-database",
-      "keywords": [
-        "PyTorch",
-        "scikit-learn"
-      ]
+      "keywords": ["PyTorch", "scikit-learn"]
     },
     {
       "name": "Physics",
       "icon": "fa-solid fa-atom",
-      "keywords": [
-        "Quantum field theory",
-        "Particle physics"
-      ]
+      "keywords": ["Quantum field theory", "Particle physics"]
     },
     {
       "name": "Electrical engineering",
       "icon": "fa-solid fa-bolt",
-      "keywords": [
-        "Power grids"
-      ]
+      "keywords": ["Power grids"]
     }
   ],
   "languages": [
