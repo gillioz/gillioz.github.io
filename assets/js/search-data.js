@@ -51,11 +51,11 @@ ninja.data = [{
           section: "Projects",handler: () => {
               window.location.href = "/projects/MorpionSolitaire.html";
             },},{
-        id: 'social-bluesky',
-        title: 'Bluesky',
+        id: 'social-email',
+        title: 'email',
         section: 'Socials',
         handler: () => {
-          window.open("https://bsky.app/profile/mgillioz.bsky.social", "_blank");
+          window.open("mailto:%6D%61%72%63.%67%69%6C%6C%69%6F%7A@%67%6D%61%69%6C.%63%6F%6D", "_blank");
         },
       },{
         id: 'social-github',
@@ -65,18 +65,11 @@ ninja.data = [{
           window.open("https://github.com/gillioz", "_blank");
         },
       },{
-        id: 'social-inspire',
-        title: 'Inspire HEP',
+        id: 'social-bluesky',
+        title: 'Bluesky',
         section: 'Socials',
         handler: () => {
-          window.open("https://inspirehep.net/authors/1057389", "_blank");
-        },
-      },{
-        id: 'social-linkedin',
-        title: 'LinkedIn',
-        section: 'Socials',
-        handler: () => {
-          window.open("https://www.linkedin.com/in/marc-gillioz-94bb716", "_blank");
+          window.open("https://bsky.app/profile/mgillioz.bsky.social", "_blank");
         },
       },{
         id: 'social-mastodon',
@@ -86,6 +79,13 @@ ninja.data = [{
           window.open("https://mathstodon.xyz/@MarcGillioz", "_blank");
         },
       },{
+        id: 'social-linkedin',
+        title: 'LinkedIn',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://www.linkedin.com/in/marc-gillioz-94bb716", "_blank");
+        },
+      },{
         id: 'social-orcid',
         title: 'ORCID',
         section: 'Socials',
@@ -93,11 +93,18 @@ ninja.data = [{
           window.open("https://orcid.org/0000-0001-9220-4681", "_blank");
         },
       },{
-        id: 'social-rss',
-        title: 'RSS Feed',
+        id: 'social-zotero',
+        title: 'Zotero',
         section: 'Socials',
         handler: () => {
-          window.open("/feed.xml", "_blank");
+          window.open("https://www.zotero.org/marc.gillioz", "_blank");
+        },
+      },{
+        id: 'social-inspire',
+        title: 'Inspire HEP',
+        section: 'Socials',
+        handler: () => {
+          window.open("https://inspirehep.net/authors/1057389", "_blank");
         },
       },{
         id: 'social-scholar',
@@ -107,11 +114,11 @@ ninja.data = [{
           window.open("https://scholar.google.com/citations?user=RLEhgN_dmcoC", "_blank");
         },
       },{
-        id: 'social-zotero',
-        title: 'Zotero',
+        id: 'social-rss',
+        title: 'RSS Feed',
         section: 'Socials',
         handler: () => {
-          window.open("https://www.zotero.org/marc.gillioz", "_blank");
+          window.open("/feed.xml", "_blank");
         },
       },{
       id: 'light-theme',
