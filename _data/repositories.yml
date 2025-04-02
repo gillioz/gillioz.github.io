@@ -6,8 +6,9 @@ repo_description_lines_max: 2
 github_repos:
   - GeeeHesso/SwissCyberGrid
   - GeeeHesso/PowerData
-  - gillioz/CoBooM-2d
-  - gillioz/QuasiPrimaryData
   - gillioz/TemperateOptimalPowerFlow.jl
   - GeeeHesso/AramisAPI.jl
+  - gillioz/CoBooM-2d
+  - gillioz/Conformal_spinors
+  - gillioz/QuasiPrimaryData
   
