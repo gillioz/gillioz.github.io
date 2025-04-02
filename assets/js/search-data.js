@@ -44,12 +44,12 @@ ninja.data = [{
           title: 'The momentum-space conformal bootstrap in 2d',
           description: "",
           section: "Projects",handler: () => {
-              window.location.href = "/projects/CoBooM-2d/";
+              window.location.href = "/projects/CoBooM-2d.html";
             },},{id: "projects-deep-learning-morpion-solitaire",
           title: 'Deep learning Morpion Solitaire',
           description: "A cool deep learning project, but currently in hibernation",
           section: "Projects",handler: () => {
-              window.location.href = "/projects/MorpionSolitaire/";
+              window.location.href = "/projects/MorpionSolitaire.html";
             },},{
         id: 'social-bluesky',
         title: 'Bluesky',
