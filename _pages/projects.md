@@ -2,7 +2,7 @@
 layout: page
 title: Projects
 permalink: /projects/
-description: A collection of my projects.
+description: An incomplete collection of my projects.
 nav: true
 nav_order: 1
 display_categories: ["Power grids", "High-energy physics", "Machine learning"]
