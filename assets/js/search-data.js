@@ -11,7 +11,7 @@ ninja.data = [{
     },
   },{id: "nav-projects",
           title: "Projects",
-          description: "A collection of my projects.",
+          description: "An incomplete collection of my projects.",
           section: "Navigation",
           handler: () => {
             window.location.href = "/projects/";
@@ -40,16 +40,26 @@ ninja.data = [{
         },{id: "news-the-website-is-online",
           title: 'The website is online!',
           description: "",
-          section: "News",},{id: "projects-the-momentum-space-conformal-bootstrap-in-2d",
-          title: 'The momentum-space conformal bootstrap in 2d',
-          description: "",
-          section: "Projects",handler: () => {
-              window.location.href = "/projects/CoBooM-2d.html";
-            },},{id: "projects-deep-learning-morpion-solitaire",
+          section: "News",},{id: "projects-deep-learning-morpion-solitaire",
           title: 'Deep learning Morpion Solitaire',
           description: "A cool deep learning project, but currently in hibernation",
           section: "Projects",handler: () => {
               window.location.href = "/projects/MorpionSolitaire.html";
+            },},{id: "projects-swisscybergrid",
+          title: 'SwissCyberGrid',
+          description: "Interactive tool for anomaly detection in the Swiss transmission grid",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/SwissCyberGrid.html";
+            },},{id: "projects-conformal-field-theory-in-momentum-space",
+          title: 'Conformal field theory in momentum space',
+          description: "Developing a new approach to conformal field theory using the momentum-space representation of correlation functions",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/momentum-CFT.html";
+            },},{id: "projects-power-grids-modeling",
+          title: 'Power grids modeling',
+          description: "Networks, variable loads, hydroelectric production, times series, ...",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/powergrid_models.html";
             },},{
         id: 'social-email',
         title: 'email',
