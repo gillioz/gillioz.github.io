@@ -1,0 +1,31 @@
+"Nature sci. data":
+  url: https://www.nature.com/sdata/
+  color: "#3598c2"
+
+"arXiv":
+  url: https://arxiv.org/
+  color: "#b31b1b"
+
+"SpringerBriefs Phys.":
+  url: https://www.springer.com/series/8902
+  color: "#002c57"
+
+"JHEP":
+  url: https://link.springer.com/journal/13130
+  color: "#d0b700"
+
+"SciPost Physics":
+  url: https://scipost.org/SciPostPhys
+  color: "#f5a11a"
+
+"Phys. Rev. D":
+  url: https://journals.aps.org/prd/
+  color: "#01b18a"
+
+"Commun. Math. Phys.":
+  url: https://link.springer.com/journal/220
+  color: "#e38523"
+
+"Ph.D. thesis":
+  url: www.uzh.ch
+  color: "#000000"
