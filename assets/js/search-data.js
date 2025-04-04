@@ -42,7 +42,7 @@ ninja.data = [{
           description: "",
           section: "News",},{id: "projects-deep-learning-morpion-solitaire",
           title: 'Deep learning Morpion Solitaire',
-          description: "A cool deep learning project, but currently in hibernation",
+          description: "A cool machine learning project, but currently in hibernation",
           section: "Projects",handler: () => {
               window.location.href = "/projects/MorpionSolitaire.html";
             },},{id: "projects-swisscybergrid",
