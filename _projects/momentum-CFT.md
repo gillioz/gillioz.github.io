@@ -2,7 +2,7 @@
 layout: page
 title: Conformal field theory in momentum space
 description: Developing a new approach to conformal field theory using the momentum-space representation of correlation functions
-img: assets/img/beta_F_functional.jpg
+img: assets/img/momenta_t.gif
 importance: 1
 category: "High-energy physics"
 related_publications: true
@@ -10,7 +10,7 @@ related_publications: true
 
 ## Genesis
 
-...
+Under construction...
 
 ## 3-point functions
 
