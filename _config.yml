@@ -5,8 +5,8 @@
 title: Marc Gillioz # the website title (if blank, full name will be used instead)
 first_name: Marc
 last_name: Gillioz
-description: > # the ">" symbol means to ignore newlines until "footer_text:"
-  my academic webpage
+contact_note: Email is the best way to reach me!
+description: Marc Gillioz's academic webpage
 footer_text: >
   Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
