@@ -13,10 +13,11 @@ The focus is on false data injection attacks that affect the operator's knowledg
 
 I wrote [the backend API](https://github.com/GeeeHesso/AramisAPI.jl) for this project in [Julia](https://julialang.org/), while the frontend was developed by [Gwenaëlle Gustin](https://www.gwengustin.ch/) and the [group of David Wannier at the HES-SO](https://www.hevs.ch/en/applied-research/research-institute-informatics/easilab-13431). The detection algorithms have been developed by our research group, and will appear in an upcoming publication.
 
-The result is visible below. It can be found in full size at [https://swisscybergrid.iigweb.hevs.ch/](https://swisscybergrid.iigweb.hevs.ch/).
+The result is visible below (large screens only). It can be found otherwise at [https://swisscybergrid.iigweb.hevs.ch/](https://swisscybergrid.iigweb.hevs.ch/).
 
-<hr>
-
-<div class="row justify-content-sm-center">
-  <embed type="text/html" src="https://swisscybergrid.iigweb.hevs.ch/" width="800" height="600">
+<div class="d-none d-md-block">
+  <hr>
+  <div class="row justify-content-sm-center">
+    <embed type="text/html" src="https://swisscybergrid.iigweb.hevs.ch/" width="800" height="600">
+  </div>
 </div>
