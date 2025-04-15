@@ -32,9 +32,9 @@ My background is in high-energy physics. I got my Ph.D. from the [University of 
 Before joining my current institution, I worked for a while as developer and cloud architect at [SCS](https://www.scs.ch), a software company located in Zurich.
 
 <div class="row justify-content-sm-center">
-<a href="https://www.hevs.ch" target="_blank">
-<img src="/assets/img/HES-SO-VS.png" alt="HES-SO Valais-Wallis" class="center">
-</a>
+  <a href="https://www.hevs.ch" target="_blank">
+  <img src="/assets/img/HES-SO-VS.png" alt="HES-SO Valais-Wallis" class="center">
+  </a>
 </div>
 
 <hr>
