@@ -55,9 +55,9 @@ ninja.data = [{
           description: "Developing a new approach to conformal field theory using the momentum-space representation of correlation functions",
           section: "Projects",handler: () => {
               window.location.href = "/projects/momentum-CFT.html";
-            },},{id: "projects-power-grids-modeling",
-          title: 'Power grids modeling',
-          description: "Networks, variable loads, hydroelectric production, times series, ...",
+            },},{id: "projects-power-transmission-grids-modeling",
+          title: 'Power transmission grids modeling',
+          description: "Realistic modeling for production and consumption in transmission networks",
           section: "Projects",handler: () => {
               window.location.href = "/projects/powergrid_models.html";
             },},{
