@@ -33,7 +33,7 @@ Our version, given in [PowerModels format](https://lanl-ansi.github.io/PowerMode
 
 ### Synthetic series for variable loads
 
-The first part of our work was to generate a statistical model of the consumption at every node of the network. This model can be used to generate arbitrarily many synthetic time series that are all different from each other, yet correlated in a realistic manner. These series are then distributed on the nodes based on the population density.
+The first part of our work was to create a statistical model of consumption at every node of the network. The model can generate arbitrarily many synthetic time series that are all different from each other, yet correlated in a realistic manner. These series are then distributed on the nodes based on the population density.
 
 <div class="row justify-content-sm-center">
   <div class="col col-lg-8">
@@ -41,12 +41,12 @@ The first part of our work was to generate a statistical model of the consumptio
   </div>
 </div>
 <div class="caption">
-	Historic time series for the total load in Switzerland (above, in blue), and synthetic series generated from our statistical model (below, in red).
+	Historical time series for the total load during a winter week in Switzerland (above, in blue), and synthetic series generated using our statistical model (below, in red).
 </div>
 
 ### Synthetic series for production
 
-The second part of our work was to design an optimization problem to distribute the production among all the possible power plants in a realistic manner. The resulting time series display all features of a realistic production, including the apparently chaotic on/off behavior of individual hydroelectric power plants and other production modes, while respecting the annual total production of each power plant and reproducing historic aggregated production by type for every country.
+The second part of our work was to design an optimization problem to distribute the production among all the possible power plants in a realistic manner. The resulting time series display all features of a realistic production, including the apparently chaotic on/off behavior of individual hydroelectric power plants, as well as other production modes, while respecting the annual total production of each power plant and reproducing historical aggregated production by type for every country.
 
 <div class="row justify-content-sm-center">
   <div class="col col-lg-10">
@@ -59,6 +59,6 @@ The second part of our work was to design an optimization problem to distribute 
   </div>
 </div>
 <div class="caption">
-    Examples of synthetic production series for hydroelectric power plants in Switzerland over one week (in red), compared with real ones (in blue).
+    Examples of synthetic production series for hydroelectric power plants in Switzerland over one week (in red), compared with real, historical data (in blue).
     The top panel shows the Biasca power plant in 2018, the lower one the Verbano plant in 2016.
 </div>
