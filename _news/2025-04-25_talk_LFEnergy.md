@@ -6,4 +6,4 @@ related_posts: false
 ---
 
 I recently gave a remote talk for the GridFM working group of the [Linux Foundation Energy project](https://lfenergy.org/).
-The slides can be found [here](assets/pdf/LFEnergyGridWG.pdf).
+The slides can be found [here](/assets/pdf/LFEnergyGridWG.pdf).
