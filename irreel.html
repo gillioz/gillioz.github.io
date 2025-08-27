@@ -1,0 +1,6667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolving Graph Website</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .text-content {
+            flex: 1;
+            padding: 2rem;
+            padding-top: 20vh;
+            padding-bottom: 20vh;
+            overflow-y: auto;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+        }
+
+        .graph-container {
+            flex: 1;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .section {
+            margin-bottom: 80vh;
+            padding: 2.5rem;
+            background: linear-gradient(145deg, rgba(51, 65, 85, 0.15) 0%, rgba(30, 41, 59, 0.25) 100%);
+            border-radius: 12px;
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .section:hover {
+            background: linear-gradient(145deg, rgba(51, 65, 85, 0.25) 0%, rgba(30, 41, 59, 0.35) 100%);
+            transform: translateY(-8px);
+            border-color: rgba(148, 163, 184, 0.2);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+        }
+
+        .section:hover::before {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.025em;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+            font-weight: 600;
+            color: #3b82f6;
+            letter-spacing: -0.025em;
+        }
+
+        ul,
+        p {
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+            text-align: justify;
+            color: #cbd5e1;
+            line-height: 1.7;
+        }
+
+        ul {
+            padding-left: 2rem;
+        }
+
+        a {
+            color: #3b82f6;
+        }
+
+        .graph-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .node:hover {
+            stroke-width: 3px;
+            filter: drop-shadow(0 6px 12px rgba(59, 130, 246, 0.4));
+        }
+
+        .link {
+            stroke: #64748b;
+            stroke-width: 2px;
+            opacity: 0.8;
+            transition: all 0.5s ease;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+        }
+
+        .link:hover {
+            stroke: #3b82f6;
+            opacity: 1;
+        }
+
+        .node-label {
+            fill: #e2e8f0;
+            font-size: 11px;
+            text-anchor: middle;
+            pointer-events: none;
+            font-weight: 500;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: rgba(30, 41, 59, 0.9);
+            color: #e2e8f0;
+            padding: 12px 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        /* Subtle grid pattern overlay */
+        .graph-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+
+        /* Custom scrollbar */
+        .text-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .text-content::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        .text-content::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 3px;
+        }
+
+        .text-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-indicator">
+        <span id="scroll-progress">0%</span>
+    </div>
+    
+    <div class="container">
+        <div class="text-content" id="textContent">
+            <div class="section" data-node="network">
+                <h1>IRREEL</h1>
+                <h2>Improved Resistance and Reactance Estimation...</h2>
+                <p>Voici un réseau de distribution électrique à basse tension correspondant à un quartier résidentiel avec une cinquantaine d'habitations.</p>
+                <p>L'opérateur du réseau aimerait modéliser ce quartier dans le but de l'incorporer à sa stratégie de surveillance et de pilotage du réseau.</p>
+                <p>Comment procéder sans mener une campagne de mesures sur le terrain?</p>
+            </div>
+
+            <div class="section" data-node="observables">
+                <h2>Que connait-on réellement?</h2>
+                <p>En pratique, on se retrouve souvent dans la situation suivante:</p>
+                <ul>
+                    <li>Les impédances des lignes ne sont pas mesurées précisément.</li>
+                    <li>Parfois la topologie même du réseau n'est pas complètement connue.</li>
+                </ul>
+                <p>Par contre, on a désormais accès aux données de consommation de chacune des habitations grâce à leurs <b>Smart Meters</b>.</p>
+            </div>
+
+            <div class="section" data-node="graph">
+                <h2>Algorithme de reconstruction</h2>
+                <p>Nous avons mis au point un algorithme de reconstruction du réseau sur la base de données de puissance active et réactive, ainsi que de tension, mesurées dans chaque habitation.</p>
+                <p>Ces données nous fournissent une représentation abstraite du réseau sous la forme d'un graphe.</p>
+            </div>
+
+            <div class="section" data-node="distance">
+                <h2>Étape 1: résistances effectives</h2>
+                <p>Dans un premier temps, notre algorithme calcule une résistance effective entre chaque paire d'habitations.</p>
+                <p>Ce calcul est basé sur une analyse statistique des profils de consommation et de tension à chaque noeud. Plus la quantité de données à disposition est importante, plus le calcul est précis.</p>
+            </div>
+
+            <div class="section" data-node="reconstruction">
+                <h2>Étape 2: Reconstruction de la topologie du réseau</h2>
+                <p>La topologie du réseau est ensuire reconstuite à partir des résistances effectives calculées précédemment.</p>
+                <p>On peut ainsi reconstruire toutes les connections et calculer leur résistance et leur réactance.</p>
+            </div>
+
+            <div class="section" data-node="result">
+                <h2>Résultat</h2>
+                <p>Nous obtenons finalemet un modèle de réseau avec une estimation précise des impédances de chaque ligne.</p>
+                <p>Intéressé·es à en savoir plus? N'hésitez pas à nous contacter:</p>
+                <ul>
+                    <li>Robin Delabays: <a href="mailto:robin.delabays@hevs.ch">robin.delabays@hevs.ch</a></li>
+                    <li>Marc Gillioz: <a href="mailto:marc.gillioz@hevs.ch">marc.gillioz@hevs.ch</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="graph-container">
+            <svg class="graph-svg" id="graph"></svg>
+        </div>
+    </div>
+
+    <script>
+        // Graph data and state
+        const nodes = [
+    {
+        "id": "1",
+        "label": "1",
+        "x": 177,
+        "y": 112,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 177,
+                "targetY": 112
+            },
+            "observables": {
+                "targetX": 177,
+                "targetY": 112
+            },
+            "graph": {
+                "targetX": 478,
+                "targetY": 59
+            },
+            "distance": {
+                "targetX": 478,
+                "targetY": 59
+            },
+            "reconstruction": {
+                "targetX": 478,
+                "targetY": 59
+            },
+            "result": {
+                "targetX": 177,
+                "targetY": 112
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "2",
+        "label": "2",
+        "x": 195,
+        "y": 135,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 195,
+                "targetY": 135
+            },
+            "observables": {
+                "targetX": 195,
+                "targetY": 135
+            },
+            "graph": {
+                "targetX": 516,
+                "targetY": 70
+            },
+            "distance": {
+                "targetX": 516,
+                "targetY": 70
+            },
+            "reconstruction": {
+                "targetX": 516,
+                "targetY": 70
+            },
+            "result": {
+                "targetX": 195,
+                "targetY": 135
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "3",
+        "label": "3",
+        "x": 145,
+        "y": 55,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 145,
+                "targetY": 55
+            },
+            "observables": {
+                "targetX": 145,
+                "targetY": 55
+            },
+            "graph": {
+                "targetX": 439,
+                "targetY": 52
+            },
+            "distance": {
+                "targetX": 439,
+                "targetY": 52
+            },
+            "reconstruction": {
+                "targetX": 439,
+                "targetY": 52
+            },
+            "result": {
+                "targetX": 145,
+                "targetY": 55
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "4",
+        "label": "4",
+        "x": 230,
+        "y": 217,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 230,
+                "targetY": 217
+            },
+            "observables": {
+                "targetX": 230,
+                "targetY": 217
+            },
+            "graph": {
+                "targetX": 586,
+                "targetY": 104
+            },
+            "distance": {
+                "targetX": 586,
+                "targetY": 104
+            },
+            "reconstruction": {
+                "targetX": 586,
+                "targetY": 104
+            },
+            "result": {
+                "targetX": 230,
+                "targetY": 217
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "5",
+        "label": "5",
+        "x": 247,
+        "y": 260,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 247,
+                "targetY": 260
+            },
+            "observables": {
+                "targetX": 247,
+                "targetY": 260
+            },
+            "graph": {
+                "targetX": 618,
+                "targetY": 126
+            },
+            "distance": {
+                "targetX": 618,
+                "targetY": 126
+            },
+            "reconstruction": {
+                "targetX": 618,
+                "targetY": 126
+            },
+            "result": {
+                "targetX": 247,
+                "targetY": 260
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "6",
+        "label": "6",
+        "x": 215,
+        "y": 172,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 215,
+                "targetY": 172
+            },
+            "observables": {
+                "targetX": 215,
+                "targetY": 172
+            },
+            "graph": {
+                "targetX": 552,
+                "targetY": 85
+            },
+            "distance": {
+                "targetX": 552,
+                "targetY": 85
+            },
+            "reconstruction": {
+                "targetX": 552,
+                "targetY": 85
+            },
+            "result": {
+                "targetX": 215,
+                "targetY": 172
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "7",
+        "label": "7",
+        "x": 282,
+        "y": 240,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 282,
+                "targetY": 240
+            },
+            "observables": {
+                "targetX": 282,
+                "targetY": 240
+            },
+            "graph": {
+                "targetX": 647,
+                "targetY": 153
+            },
+            "distance": {
+                "targetX": 647,
+                "targetY": 153
+            },
+            "reconstruction": {
+                "targetX": 647,
+                "targetY": 153
+            },
+            "result": {
+                "targetX": 282,
+                "targetY": 240
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "8",
+        "label": "8",
+        "x": 310,
+        "y": 180,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 310,
+                "targetY": 180
+            },
+            "observables": {
+                "targetX": 310,
+                "targetY": 180
+            },
+            "graph": {
+                "targetX": 674,
+                "targetY": 182
+            },
+            "distance": {
+                "targetX": 674,
+                "targetY": 182
+            },
+            "reconstruction": {
+                "targetX": 674,
+                "targetY": 182
+            },
+            "result": {
+                "targetX": 310,
+                "targetY": 180
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "9",
+        "label": "9",
+        "x": 455,
+        "y": 140,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 455,
+                "targetY": 140
+            },
+            "observables": {
+                "targetX": 455,
+                "targetY": 140
+            },
+            "graph": {
+                "targetX": 715,
+                "targetY": 248
+            },
+            "distance": {
+                "targetX": 715,
+                "targetY": 248
+            },
+            "reconstruction": {
+                "targetX": 715,
+                "targetY": 248
+            },
+            "result": {
+                "targetX": 455,
+                "targetY": 140
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "10",
+        "label": "10",
+        "x": 512,
+        "y": 87,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 512,
+                "targetY": 87
+            },
+            "observables": {
+                "targetX": 512,
+                "targetY": 87
+            },
+            "graph": {
+                "targetX": 730,
+                "targetY": 284
+            },
+            "distance": {
+                "targetX": 730,
+                "targetY": 284
+            },
+            "reconstruction": {
+                "targetX": 730,
+                "targetY": 284
+            },
+            "result": {
+                "targetX": 512,
+                "targetY": 87
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "11",
+        "label": "11",
+        "x": 550,
+        "y": 55,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 550,
+                "targetY": 55
+            },
+            "observables": {
+                "targetX": 550,
+                "targetY": 55
+            },
+            "graph": {
+                "targetX": 741,
+                "targetY": 322
+            },
+            "distance": {
+                "targetX": 741,
+                "targetY": 322
+            },
+            "reconstruction": {
+                "targetX": 741,
+                "targetY": 322
+            },
+            "result": {
+                "targetX": 550,
+                "targetY": 55
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "12",
+        "label": "12",
+        "x": 372,
+        "y": 147,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 372,
+                "targetY": 147
+            },
+            "observables": {
+                "targetX": 372,
+                "targetY": 147
+            },
+            "graph": {
+                "targetX": 696,
+                "targetY": 214
+            },
+            "distance": {
+                "targetX": 696,
+                "targetY": 214
+            },
+            "reconstruction": {
+                "targetX": 696,
+                "targetY": 214
+            },
+            "result": {
+                "targetX": 372,
+                "targetY": 147
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "13",
+        "label": "13",
+        "x": 445,
+        "y": 442,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 445,
+                "targetY": 442
+            },
+            "observables": {
+                "targetX": 445,
+                "targetY": 442
+            },
+            "graph": {
+                "targetX": 741,
+                "targetY": 478
+            },
+            "distance": {
+                "targetX": 741,
+                "targetY": 478
+            },
+            "reconstruction": {
+                "targetX": 741,
+                "targetY": 478
+            },
+            "result": {
+                "targetX": 445,
+                "targetY": 442
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "14",
+        "label": "14",
+        "x": 357,
+        "y": 437,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 357,
+                "targetY": 437
+            },
+            "observables": {
+                "targetX": 357,
+                "targetY": 437
+            },
+            "graph": {
+                "targetX": 730,
+                "targetY": 516
+            },
+            "distance": {
+                "targetX": 730,
+                "targetY": 516
+            },
+            "reconstruction": {
+                "targetX": 730,
+                "targetY": 516
+            },
+            "result": {
+                "targetX": 357,
+                "targetY": 437
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "15",
+        "label": "15",
+        "x": 500,
+        "y": 422,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 500,
+                "targetY": 422
+            },
+            "observables": {
+                "targetX": 500,
+                "targetY": 422
+            },
+            "graph": {
+                "targetX": 748,
+                "targetY": 439
+            },
+            "distance": {
+                "targetX": 748,
+                "targetY": 439
+            },
+            "reconstruction": {
+                "targetX": 748,
+                "targetY": 439
+            },
+            "result": {
+                "targetX": 500,
+                "targetY": 422
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "16",
+        "label": "16",
+        "x": 555,
+        "y": 410,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 555,
+                "targetY": 410
+            },
+            "observables": {
+                "targetX": 555,
+                "targetY": 410
+            },
+            "graph": {
+                "targetX": 750,
+                "targetY": 400
+            },
+            "distance": {
+                "targetX": 750,
+                "targetY": 400
+            },
+            "reconstruction": {
+                "targetX": 750,
+                "targetY": 400
+            },
+            "result": {
+                "targetX": 555,
+                "targetY": 410
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "17",
+        "label": "17",
+        "x": 610,
+        "y": 372,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 610,
+                "targetY": 372
+            },
+            "observables": {
+                "targetX": 610,
+                "targetY": 372
+            },
+            "graph": {
+                "targetX": 748,
+                "targetY": 361
+            },
+            "distance": {
+                "targetX": 748,
+                "targetY": 361
+            },
+            "reconstruction": {
+                "targetX": 748,
+                "targetY": 361
+            },
+            "result": {
+                "targetX": 610,
+                "targetY": 372
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "18",
+        "label": "18",
+        "x": 337,
+        "y": 565,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 337,
+                "targetY": 565
+            },
+            "observables": {
+                "targetX": 337,
+                "targetY": 565
+            },
+            "graph": {
+                "targetX": 618,
+                "targetY": 674
+            },
+            "distance": {
+                "targetX": 618,
+                "targetY": 674
+            },
+            "reconstruction": {
+                "targetX": 618,
+                "targetY": 674
+            },
+            "result": {
+                "targetX": 337,
+                "targetY": 565
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "19",
+        "label": "19",
+        "x": 267,
+        "y": 492,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 267,
+                "targetY": 492
+            },
+            "observables": {
+                "targetX": 267,
+                "targetY": 492
+            },
+            "graph": {
+                "targetX": 696,
+                "targetY": 586
+            },
+            "distance": {
+                "targetX": 696,
+                "targetY": 586
+            },
+            "reconstruction": {
+                "targetX": 696,
+                "targetY": 586
+            },
+            "result": {
+                "targetX": 267,
+                "targetY": 492
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "20",
+        "label": "20",
+        "x": 327,
+        "y": 532,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 327,
+                "targetY": 532
+            },
+            "observables": {
+                "targetX": 327,
+                "targetY": 532
+            },
+            "graph": {
+                "targetX": 647,
+                "targetY": 647
+            },
+            "distance": {
+                "targetX": 647,
+                "targetY": 647
+            },
+            "reconstruction": {
+                "targetX": 647,
+                "targetY": 647
+            },
+            "result": {
+                "targetX": 327,
+                "targetY": 532
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "21",
+        "label": "21",
+        "x": 250,
+        "y": 460,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 250,
+                "targetY": 460
+            },
+            "observables": {
+                "targetX": 250,
+                "targetY": 460
+            },
+            "graph": {
+                "targetX": 715,
+                "targetY": 552
+            },
+            "distance": {
+                "targetX": 715,
+                "targetY": 552
+            },
+            "reconstruction": {
+                "targetX": 715,
+                "targetY": 552
+            },
+            "result": {
+                "targetX": 250,
+                "targetY": 460
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "22",
+        "label": "22",
+        "x": 297,
+        "y": 510,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 297,
+                "targetY": 510
+            },
+            "observables": {
+                "targetX": 297,
+                "targetY": 510
+            },
+            "graph": {
+                "targetX": 674,
+                "targetY": 618
+            },
+            "distance": {
+                "targetX": 674,
+                "targetY": 618
+            },
+            "reconstruction": {
+                "targetX": 674,
+                "targetY": 618
+            },
+            "result": {
+                "targetX": 297,
+                "targetY": 510
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "23",
+        "label": "23",
+        "x": 360,
+        "y": 600,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 360,
+                "targetY": 600
+            },
+            "observables": {
+                "targetX": 360,
+                "targetY": 600
+            },
+            "graph": {
+                "targetX": 586,
+                "targetY": 696
+            },
+            "distance": {
+                "targetX": 586,
+                "targetY": 696
+            },
+            "reconstruction": {
+                "targetX": 586,
+                "targetY": 696
+            },
+            "result": {
+                "targetX": 360,
+                "targetY": 600
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "24",
+        "label": "24",
+        "x": 110,
+        "y": 597,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 110,
+                "targetY": 597
+            },
+            "observables": {
+                "targetX": 110,
+                "targetY": 597
+            },
+            "graph": {
+                "targetX": 361,
+                "targetY": 52
+            },
+            "distance": {
+                "targetX": 361,
+                "targetY": 52
+            },
+            "reconstruction": {
+                "targetX": 361,
+                "targetY": 52
+            },
+            "result": {
+                "targetX": 110,
+                "targetY": 597
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "25",
+        "label": "25",
+        "x": 495,
+        "y": 580,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 495,
+                "targetY": 580
+            },
+            "observables": {
+                "targetX": 495,
+                "targetY": 580
+            },
+            "graph": {
+                "targetX": 478,
+                "targetY": 741
+            },
+            "distance": {
+                "targetX": 478,
+                "targetY": 741
+            },
+            "reconstruction": {
+                "targetX": 478,
+                "targetY": 741
+            },
+            "result": {
+                "targetX": 495,
+                "targetY": 580
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "26",
+        "label": "26",
+        "x": 200,
+        "y": 702,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 200,
+                "targetY": 702
+            },
+            "observables": {
+                "targetX": 200,
+                "targetY": 702
+            },
+            "graph": {
+                "targetX": 248,
+                "targetY": 85
+            },
+            "distance": {
+                "targetX": 248,
+                "targetY": 85
+            },
+            "reconstruction": {
+                "targetX": 248,
+                "targetY": 85
+            },
+            "result": {
+                "targetX": 200,
+                "targetY": 702
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "27",
+        "label": "27",
+        "x": 142,
+        "y": 720,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 142,
+                "targetY": 720
+            },
+            "observables": {
+                "targetX": 142,
+                "targetY": 720
+            },
+            "graph": {
+                "targetX": 284,
+                "targetY": 70
+            },
+            "distance": {
+                "targetX": 284,
+                "targetY": 70
+            },
+            "reconstruction": {
+                "targetX": 284,
+                "targetY": 70
+            },
+            "result": {
+                "targetX": 142,
+                "targetY": 720
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "28",
+        "label": "28",
+        "x": 125,
+        "y": 660,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 125,
+                "targetY": 660
+            },
+            "observables": {
+                "targetX": 125,
+                "targetY": 660
+            },
+            "graph": {
+                "targetX": 322,
+                "targetY": 59
+            },
+            "distance": {
+                "targetX": 322,
+                "targetY": 59
+            },
+            "reconstruction": {
+                "targetX": 322,
+                "targetY": 59
+            },
+            "result": {
+                "targetX": 125,
+                "targetY": 660
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "29",
+        "label": "29",
+        "x": 585,
+        "y": 552,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 585,
+                "targetY": 552
+            },
+            "observables": {
+                "targetX": 585,
+                "targetY": 552
+            },
+            "graph": {
+                "targetX": 400,
+                "targetY": 750
+            },
+            "distance": {
+                "targetX": 400,
+                "targetY": 750
+            },
+            "reconstruction": {
+                "targetX": 400,
+                "targetY": 750
+            },
+            "result": {
+                "targetX": 585,
+                "targetY": 552
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "30",
+        "label": "30",
+        "x": 445,
+        "y": 592,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 445,
+                "targetY": 592
+            },
+            "observables": {
+                "targetX": 445,
+                "targetY": 592
+            },
+            "graph": {
+                "targetX": 516,
+                "targetY": 730
+            },
+            "distance": {
+                "targetX": 516,
+                "targetY": 730
+            },
+            "reconstruction": {
+                "targetX": 516,
+                "targetY": 730
+            },
+            "result": {
+                "targetX": 445,
+                "targetY": 592
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "31",
+        "label": "31",
+        "x": 532,
+        "y": 565,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 532,
+                "targetY": 565
+            },
+            "observables": {
+                "targetX": 532,
+                "targetY": 565
+            },
+            "graph": {
+                "targetX": 439,
+                "targetY": 748
+            },
+            "distance": {
+                "targetX": 439,
+                "targetY": 748
+            },
+            "reconstruction": {
+                "targetX": 439,
+                "targetY": 748
+            },
+            "result": {
+                "targetX": 532,
+                "targetY": 565
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "32",
+        "label": "32",
+        "x": 200,
+        "y": 800,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 200,
+                "targetY": 800
+            },
+            "observables": {
+                "targetX": 200,
+                "targetY": 800
+            },
+            "graph": {
+                "targetX": 182,
+                "targetY": 126
+            },
+            "distance": {
+                "targetX": 182,
+                "targetY": 126
+            },
+            "reconstruction": {
+                "targetX": 182,
+                "targetY": 126
+            },
+            "result": {
+                "targetX": 200,
+                "targetY": 800
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "33",
+        "label": "33",
+        "x": 697,
+        "y": 512,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 697,
+                "targetY": 512
+            },
+            "observables": {
+                "targetX": 697,
+                "targetY": 512
+            },
+            "graph": {
+                "targetX": 284,
+                "targetY": 730
+            },
+            "distance": {
+                "targetX": 284,
+                "targetY": 730
+            },
+            "reconstruction": {
+                "targetX": 284,
+                "targetY": 730
+            },
+            "result": {
+                "targetX": 697,
+                "targetY": 512
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "34",
+        "label": "34",
+        "x": 415,
+        "y": 600,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 415,
+                "targetY": 600
+            },
+            "observables": {
+                "targetX": 415,
+                "targetY": 600
+            },
+            "graph": {
+                "targetX": 552,
+                "targetY": 715
+            },
+            "distance": {
+                "targetX": 552,
+                "targetY": 715
+            },
+            "reconstruction": {
+                "targetX": 552,
+                "targetY": 715
+            },
+            "result": {
+                "targetX": 415,
+                "targetY": 600
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "35",
+        "label": "35",
+        "x": 755,
+        "y": 477,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 755,
+                "targetY": 477
+            },
+            "observables": {
+                "targetX": 755,
+                "targetY": 477
+            },
+            "graph": {
+                "targetX": 248,
+                "targetY": 715
+            },
+            "distance": {
+                "targetX": 248,
+                "targetY": 715
+            },
+            "reconstruction": {
+                "targetX": 248,
+                "targetY": 715
+            },
+            "result": {
+                "targetX": 755,
+                "targetY": 477
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "36",
+        "label": "36",
+        "x": 665,
+        "y": 522,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 665,
+                "targetY": 522
+            },
+            "observables": {
+                "targetX": 665,
+                "targetY": 522
+            },
+            "graph": {
+                "targetX": 322,
+                "targetY": 741
+            },
+            "distance": {
+                "targetX": 322,
+                "targetY": 741
+            },
+            "reconstruction": {
+                "targetX": 322,
+                "targetY": 741
+            },
+            "result": {
+                "targetX": 665,
+                "targetY": 522
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "37",
+        "label": "37",
+        "x": 597,
+        "y": 537,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 597,
+                "targetY": 537
+            },
+            "observables": {
+                "targetX": 597,
+                "targetY": 537
+            },
+            "graph": {
+                "targetX": 361,
+                "targetY": 748
+            },
+            "distance": {
+                "targetX": 361,
+                "targetY": 748
+            },
+            "reconstruction": {
+                "targetX": 361,
+                "targetY": 748
+            },
+            "result": {
+                "targetX": 597,
+                "targetY": 537
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "38",
+        "label": "38",
+        "x": 215,
+        "y": 835,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 215,
+                "targetY": 835
+            },
+            "observables": {
+                "targetX": 215,
+                "targetY": 835
+            },
+            "graph": {
+                "targetX": 153,
+                "targetY": 153
+            },
+            "distance": {
+                "targetX": 153,
+                "targetY": 153
+            },
+            "reconstruction": {
+                "targetX": 153,
+                "targetY": 153
+            },
+            "result": {
+                "targetX": 215,
+                "targetY": 835
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "39",
+        "label": "39",
+        "x": 425,
+        "y": 840,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 425,
+                "targetY": 840
+            },
+            "observables": {
+                "targetX": 425,
+                "targetY": 840
+            },
+            "graph": {
+                "targetX": 59,
+                "targetY": 322
+            },
+            "distance": {
+                "targetX": 59,
+                "targetY": 322
+            },
+            "reconstruction": {
+                "targetX": 59,
+                "targetY": 322
+            },
+            "result": {
+                "targetX": 425,
+                "targetY": 840
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "40",
+        "label": "40",
+        "x": 457,
+        "y": 825,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 457,
+                "targetY": 825
+            },
+            "observables": {
+                "targetX": 457,
+                "targetY": 825
+            },
+            "graph": {
+                "targetX": 52,
+                "targetY": 361
+            },
+            "distance": {
+                "targetX": 52,
+                "targetY": 361
+            },
+            "reconstruction": {
+                "targetX": 52,
+                "targetY": 361
+            },
+            "result": {
+                "targetX": 457,
+                "targetY": 825
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "41",
+        "label": "41",
+        "x": 560,
+        "y": 790,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 560,
+                "targetY": 790
+            },
+            "observables": {
+                "targetX": 560,
+                "targetY": 790
+            },
+            "graph": {
+                "targetX": 59,
+                "targetY": 478
+            },
+            "distance": {
+                "targetX": 59,
+                "targetY": 478
+            },
+            "reconstruction": {
+                "targetX": 59,
+                "targetY": 478
+            },
+            "result": {
+                "targetX": 560,
+                "targetY": 790
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "42",
+        "label": "42",
+        "x": 377,
+        "y": 855,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 377,
+                "targetY": 855
+            },
+            "observables": {
+                "targetX": 377,
+                "targetY": 855
+            },
+            "graph": {
+                "targetX": 70,
+                "targetY": 284
+            },
+            "distance": {
+                "targetX": 70,
+                "targetY": 284
+            },
+            "reconstruction": {
+                "targetX": 70,
+                "targetY": 284
+            },
+            "result": {
+                "targetX": 377,
+                "targetY": 855
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "43",
+        "label": "43",
+        "x": 627,
+        "y": 770,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 627,
+                "targetY": 770
+            },
+            "observables": {
+                "targetX": 627,
+                "targetY": 770
+            },
+            "graph": {
+                "targetX": 85,
+                "targetY": 552
+            },
+            "distance": {
+                "targetX": 85,
+                "targetY": 552
+            },
+            "reconstruction": {
+                "targetX": 85,
+                "targetY": 552
+            },
+            "result": {
+                "targetX": 627,
+                "targetY": 770
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "44",
+        "label": "44",
+        "x": 160,
+        "y": 782,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 160,
+                "targetY": 782
+            },
+            "observables": {
+                "targetX": 160,
+                "targetY": 782
+            },
+            "graph": {
+                "targetX": 214,
+                "targetY": 104
+            },
+            "distance": {
+                "targetX": 214,
+                "targetY": 104
+            },
+            "reconstruction": {
+                "targetX": 214,
+                "targetY": 104
+            },
+            "result": {
+                "targetX": 160,
+                "targetY": 782
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "45",
+        "label": "45",
+        "x": 600,
+        "y": 770,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 600,
+                "targetY": 770
+            },
+            "observables": {
+                "targetX": 600,
+                "targetY": 770
+            },
+            "graph": {
+                "targetX": 70,
+                "targetY": 516
+            },
+            "distance": {
+                "targetX": 70,
+                "targetY": 516
+            },
+            "reconstruction": {
+                "targetX": 70,
+                "targetY": 516
+            },
+            "result": {
+                "targetX": 600,
+                "targetY": 770
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "46",
+        "label": "46",
+        "x": 225,
+        "y": 872,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 225,
+                "targetY": 872
+            },
+            "observables": {
+                "targetX": 225,
+                "targetY": 872
+            },
+            "graph": {
+                "targetX": 126,
+                "targetY": 182
+            },
+            "distance": {
+                "targetX": 126,
+                "targetY": 182
+            },
+            "reconstruction": {
+                "targetX": 126,
+                "targetY": 182
+            },
+            "result": {
+                "targetX": 225,
+                "targetY": 872
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "47",
+        "label": "47",
+        "x": 647,
+        "y": 757,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 647,
+                "targetY": 757
+            },
+            "observables": {
+                "targetX": 647,
+                "targetY": 757
+            },
+            "graph": {
+                "targetX": 104,
+                "targetY": 586
+            },
+            "distance": {
+                "targetX": 104,
+                "targetY": 586
+            },
+            "reconstruction": {
+                "targetX": 104,
+                "targetY": 586
+            },
+            "result": {
+                "targetX": 647,
+                "targetY": 757
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "48",
+        "label": "48",
+        "x": 357,
+        "y": 895,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 357,
+                "targetY": 895
+            },
+            "observables": {
+                "targetX": 357,
+                "targetY": 895
+            },
+            "graph": {
+                "targetX": 104,
+                "targetY": 214
+            },
+            "distance": {
+                "targetX": 104,
+                "targetY": 214
+            },
+            "reconstruction": {
+                "targetX": 104,
+                "targetY": 214
+            },
+            "result": {
+                "targetX": 357,
+                "targetY": 895
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "49",
+        "label": "49",
+        "x": 332,
+        "y": 835,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 332,
+                "targetY": 835
+            },
+            "observables": {
+                "targetX": 332,
+                "targetY": 835
+            },
+            "graph": {
+                "targetX": 85,
+                "targetY": 248
+            },
+            "distance": {
+                "targetX": 85,
+                "targetY": 248
+            },
+            "reconstruction": {
+                "targetX": 85,
+                "targetY": 248
+            },
+            "result": {
+                "targetX": 332,
+                "targetY": 835
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "50",
+        "label": "50",
+        "x": 737,
+        "y": 722,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 737,
+                "targetY": 722
+            },
+            "observables": {
+                "targetX": 737,
+                "targetY": 722
+            },
+            "graph": {
+                "targetX": 182,
+                "targetY": 674
+            },
+            "distance": {
+                "targetX": 182,
+                "targetY": 674
+            },
+            "reconstruction": {
+                "targetX": 182,
+                "targetY": 674
+            },
+            "result": {
+                "targetX": 737,
+                "targetY": 722
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "51",
+        "label": "51",
+        "x": 542,
+        "y": 817,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 542,
+                "targetY": 817
+            },
+            "observables": {
+                "targetX": 542,
+                "targetY": 817
+            },
+            "graph": {
+                "targetX": 52,
+                "targetY": 439
+            },
+            "distance": {
+                "targetX": 52,
+                "targetY": 439
+            },
+            "reconstruction": {
+                "targetX": 52,
+                "targetY": 439
+            },
+            "result": {
+                "targetX": 542,
+                "targetY": 817
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "52",
+        "label": "52",
+        "x": 692,
+        "y": 752,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 692,
+                "targetY": 752
+            },
+            "observables": {
+                "targetX": 692,
+                "targetY": 752
+            },
+            "graph": {
+                "targetX": 126,
+                "targetY": 618
+            },
+            "distance": {
+                "targetX": 126,
+                "targetY": 618
+            },
+            "reconstruction": {
+                "targetX": 126,
+                "targetY": 618
+            },
+            "result": {
+                "targetX": 692,
+                "targetY": 752
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "53",
+        "label": "53",
+        "x": 780,
+        "y": 700,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 780,
+                "targetY": 700
+            },
+            "observables": {
+                "targetX": 780,
+                "targetY": 700
+            },
+            "graph": {
+                "targetX": 214,
+                "targetY": 696
+            },
+            "distance": {
+                "targetX": 214,
+                "targetY": 696
+            },
+            "reconstruction": {
+                "targetX": 214,
+                "targetY": 696
+            },
+            "result": {
+                "targetX": 780,
+                "targetY": 700
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "54",
+        "label": "54",
+        "x": 500,
+        "y": 822,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 500,
+                "targetY": 822
+            },
+            "observables": {
+                "targetX": 500,
+                "targetY": 822
+            },
+            "graph": {
+                "targetX": 50,
+                "targetY": 400
+            },
+            "distance": {
+                "targetX": 50,
+                "targetY": 400
+            },
+            "reconstruction": {
+                "targetX": 50,
+                "targetY": 400
+            },
+            "result": {
+                "targetX": 500,
+                "targetY": 822
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "55",
+        "label": "55",
+        "x": 715,
+        "y": 737,
+        "stages": [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 715,
+                "targetY": 737
+            },
+            "observables": {
+                "targetX": 715,
+                "targetY": 737
+            },
+            "graph": {
+                "targetX": 153,
+                "targetY": 647
+            },
+            "distance": {
+                "targetX": 153,
+                "targetY": 647
+            },
+            "reconstruction": {
+                "targetX": 153,
+                "targetY": 647
+            },
+            "result": {
+                "targetX": 715,
+                "targetY": 737
+            }
+        },
+        "active": false,
+        "color": "#0e4b0e"
+    },
+    {
+        "id": "h_56",
+        "x": 80,
+        "y": 70,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 80,
+                "targetY": 70
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_56",
+        "x": 400,
+        "y": 50,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 400,
+                "targetY": 50
+            },
+            "result": {
+                "targetX": 80,
+                "targetY": 70
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_57",
+        "x": 82,
+        "y": 160,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 82,
+                "targetY": 160
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_57",
+        "x": 415,
+        "y": 137,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 415,
+                "targetY": 137
+            },
+            "result": {
+                "targetX": 82,
+                "targetY": 160
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_58",
+        "x": 135,
+        "y": 117,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 135,
+                "targetY": 117
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_58",
+        "x": 442,
+        "y": 105,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 442,
+                "targetY": 105
+            },
+            "result": {
+                "targetX": 135,
+                "targetY": 117
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_59",
+        "x": 125,
+        "y": 227,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 125,
+                "targetY": 227
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_59",
+        "x": 441,
+        "y": 198,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 441,
+                "targetY": 198
+            },
+            "result": {
+                "targetX": 125,
+                "targetY": 227
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_60",
+        "x": 180,
+        "y": 180,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 180,
+                "targetY": 180
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_60",
+        "x": 502,
+        "y": 130,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 502,
+                "targetY": 130
+            },
+            "result": {
+                "targetX": 180,
+                "targetY": 180
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_61",
+        "x": 167,
+        "y": 297,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 167,
+                "targetY": 297
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_61",
+        "x": 461,
+        "y": 252,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 461,
+                "targetY": 252
+            },
+            "result": {
+                "targetX": 167,
+                "targetY": 297
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_62",
+        "x": 207,
+        "y": 260,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 207,
+                "targetY": 260
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_62",
+        "x": 551,
+        "y": 166,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 551,
+                "targetY": 166
+            },
+            "result": {
+                "targetX": 207,
+                "targetY": 260
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_63",
+        "x": 197,
+        "y": 332,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 197,
+                "targetY": 332
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_63",
+        "x": 487,
+        "y": 314,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 487,
+                "targetY": 314
+            },
+            "result": {
+                "targetX": 197,
+                "targetY": 332
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_64",
+        "x": 232,
+        "y": 392,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 232,
+                "targetY": 392
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_64",
+        "x": 527,
+        "y": 394,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 527,
+                "targetY": 394
+            },
+            "result": {
+                "targetX": 232,
+                "targetY": 392
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_65",
+        "x": 325,
+        "y": 372,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 325,
+                "targetY": 372
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_65",
+        "x": 587,
+        "y": 417,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 587,
+                "targetY": 417
+            },
+            "result": {
+                "targetX": 325,
+                "targetY": 372
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_66",
+        "x": 430,
+        "y": 347,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 430,
+                "targetY": 347
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_66",
+        "x": 640,
+        "y": 421,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 640,
+                "targetY": 421
+            },
+            "result": {
+                "targetX": 430,
+                "targetY": 347
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_67",
+        "x": 542,
+        "y": 305,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 542,
+                "targetY": 305
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_67",
+        "x": 665,
+        "y": 409,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 665,
+                "targetY": 409
+            },
+            "result": {
+                "targetX": 542,
+                "targetY": 305
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_68",
+        "x": 307,
+        "y": 297,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 307,
+                "targetY": 297
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_68",
+        "x": 549,
+        "y": 261,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 549,
+                "targetY": 261
+            },
+            "result": {
+                "targetX": 307,
+                "targetY": 297
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_69",
+        "x": 392,
+        "y": 252,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 392,
+                "targetY": 252
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_69",
+        "x": 590,
+        "y": 260,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 590,
+                "targetY": 260
+            },
+            "result": {
+                "targetX": 392,
+                "targetY": 252
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_70",
+        "x": 355,
+        "y": 192,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 355,
+                "targetY": 192
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_70",
+        "x": 631,
+        "y": 243,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 631,
+                "targetY": 243
+            },
+            "result": {
+                "targetX": 355,
+                "targetY": 192
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_71",
+        "x": 485,
+        "y": 200,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 485,
+                "targetY": 200
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_71",
+        "x": 587,
+        "y": 336,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 587,
+                "targetY": 336
+            },
+            "result": {
+                "targetX": 485,
+                "targetY": 200
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_72",
+        "x": 580,
+        "y": 147,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 580,
+                "targetY": 147
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_72",
+        "x": 624,
+        "y": 336,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 624,
+                "targetY": 336
+            },
+            "result": {
+                "targetX": 580,
+                "targetY": 147
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_73",
+        "x": 552,
+        "y": 105,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 552,
+                "targetY": 105
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_73",
+        "x": 659,
+        "y": 337,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 659,
+                "targetY": 337
+            },
+            "result": {
+                "targetX": 552,
+                "targetY": 105
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_74",
+        "x": 175,
+        "y": 475,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 175,
+                "targetY": 475
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_74",
+        "x": 619,
+        "y": 496,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 619,
+                "targetY": 496
+            },
+            "result": {
+                "targetX": 175,
+                "targetY": 475
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_75",
+        "x": 462,
+        "y": 405,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 462,
+                "targetY": 405
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_75",
+        "x": 685,
+        "y": 450,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 685,
+                "targetY": 450
+            },
+            "result": {
+                "targetX": 462,
+                "targetY": 405
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_76",
+        "x": 212,
+        "y": 522,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 212,
+                "targetY": 522
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_76",
+        "x": 498,
+        "y": 480,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 498,
+                "targetY": 480
+            },
+            "result": {
+                "targetX": 212,
+                "targetY": 522
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_77",
+        "x": 230,
+        "y": 552,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 230,
+                "targetY": 552
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_77",
+        "x": 421,
+        "y": 356,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 421,
+                "targetY": 356
+            },
+            "result": {
+                "targetX": 230,
+                "targetY": 552
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_78",
+        "x": 567,
+        "y": 360,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 567,
+                "targetY": 360
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_78",
+        "x": 691,
+        "y": 393,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 691,
+                "targetY": 393
+            },
+            "result": {
+                "targetX": 567,
+                "targetY": 360
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_79",
+        "x": 245,
+        "y": 557,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 245,
+                "targetY": 557
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_79",
+        "x": 410,
+        "y": 470,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 410,
+                "targetY": 470
+            },
+            "result": {
+                "targetX": 245,
+                "targetY": 557
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_80",
+        "x": 282,
+        "y": 615,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 282,
+                "targetY": 615
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_80",
+        "x": 473,
+        "y": 539,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 473,
+                "targetY": 539
+            },
+            "result": {
+                "targetX": 282,
+                "targetY": 615
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_81",
+        "x": 310,
+        "y": 657,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 310,
+                "targetY": 657
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_81",
+        "x": 522,
+        "y": 621,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 522,
+                "targetY": 621
+            },
+            "result": {
+                "targetX": 310,
+                "targetY": 657
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_82",
+        "x": 282,
+        "y": 550,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 282,
+                "targetY": 550
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_82",
+        "x": 596,
+        "y": 579,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 596,
+                "targetY": 579
+            },
+            "result": {
+                "targetX": 282,
+                "targetY": 550
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_83",
+        "x": 185,
+        "y": 595,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 185,
+                "targetY": 595
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_83",
+        "x": 403,
+        "y": 286,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 403,
+                "targetY": 286
+            },
+            "result": {
+                "targetX": 185,
+                "targetY": 595
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_84",
+        "x": 230,
+        "y": 657,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 230,
+                "targetY": 657
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_84",
+        "x": 364,
+        "y": 212,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 364,
+                "targetY": 212
+            },
+            "result": {
+                "targetX": 230,
+                "targetY": 657
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_85",
+        "x": 405,
+        "y": 687,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 405,
+                "targetY": 687
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_85",
+        "x": 481,
+        "y": 641,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 481,
+                "targetY": 641
+            },
+            "result": {
+                "targetX": 405,
+                "targetY": 687
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_86",
+        "x": 495,
+        "y": 660,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 495,
+                "targetY": 660
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_86",
+        "x": 432,
+        "y": 606,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 432,
+                "targetY": 606
+            },
+            "result": {
+                "targetX": 495,
+                "targetY": 660
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_87",
+        "x": 480,
+        "y": 607,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 480,
+                "targetY": 607
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_87",
+        "x": 455,
+        "y": 679,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 455,
+                "targetY": 679
+            },
+            "result": {
+                "targetX": 480,
+                "targetY": 607
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_88",
+        "x": 230,
+        "y": 710,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 230,
+                "targetY": 710
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_88",
+        "x": 288,
+        "y": 165,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 288,
+                "targetY": 165
+            },
+            "result": {
+                "targetX": 230,
+                "targetY": 710
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_89",
+        "x": 585,
+        "y": 620,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 585,
+                "targetY": 620
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_89",
+        "x": 380,
+        "y": 543,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 380,
+                "targetY": 543
+            },
+            "result": {
+                "targetX": 585,
+                "targetY": 620
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_90",
+        "x": 157,
+        "y": 672,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 157,
+                "targetY": 672
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_90",
+        "x": 337,
+        "y": 134,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 337,
+                "targetY": 134
+            },
+            "result": {
+                "targetX": 157,
+                "targetY": 672
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_91",
+        "x": 565,
+        "y": 575,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 565,
+                "targetY": 575
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_91",
+        "x": 398,
+        "y": 691,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 398,
+                "targetY": 691
+            },
+            "result": {
+                "targetX": 565,
+                "targetY": 575
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_92",
+        "x": 655,
+        "y": 590,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 655,
+                "targetY": 590
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_92",
+        "x": 329,
+        "y": 604,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 329,
+                "targetY": 604
+            },
+            "result": {
+                "targetX": 655,
+                "targetY": 590
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_93",
+        "x": 205,
+        "y": 745,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 205,
+                "targetY": 745
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_93",
+        "x": 308,
+        "y": 271,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 308,
+                "targetY": 271
+            },
+            "result": {
+                "targetX": 205,
+                "targetY": 745
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_94",
+        "x": 722,
+        "y": 562,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 722,
+                "targetY": 562
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_94",
+        "x": 303,
+        "y": 654,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 303,
+                "targetY": 654
+            },
+            "result": {
+                "targetX": 722,
+                "targetY": 562
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_95",
+        "x": 812,
+        "y": 540,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 812,
+                "targetY": 540
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_95",
+        "x": 268,
+        "y": 683,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 268,
+                "targetY": 683
+            },
+            "result": {
+                "targetX": 812,
+                "targetY": 540
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_96",
+        "x": 235,
+        "y": 767,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 235,
+                "targetY": 767
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_96",
+        "x": 232,
+        "y": 196,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 232,
+                "targetY": 196
+            },
+            "result": {
+                "targetX": 235,
+                "targetY": 767
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_97",
+        "x": 262,
+        "y": 800,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 262,
+                "targetY": 800
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_97",
+        "x": 301,
+        "y": 339,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 301,
+                "targetY": 339
+            },
+            "result": {
+                "targetX": 262,
+                "targetY": 800
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_98",
+        "x": 640,
+        "y": 547,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 640,
+                "targetY": 547
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_98",
+        "x": 348,
+        "y": 679,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 348,
+                "targetY": 679
+            },
+            "result": {
+                "targetX": 640,
+                "targetY": 547
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_99",
+        "x": 277,
+        "y": 825,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 277,
+                "targetY": 825
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_99",
+        "x": 218,
+        "y": 326,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 218,
+                "targetY": 326
+            },
+            "result": {
+                "targetX": 277,
+                "targetY": 825
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_100",
+        "x": 370,
+        "y": 787,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 370,
+                "targetY": 787
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_100",
+        "x": 173,
+        "y": 333,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 173,
+                "targetY": 333
+            },
+            "result": {
+                "targetX": 370,
+                "targetY": 787
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_101",
+        "x": 390,
+        "y": 830,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 390,
+                "targetY": 830
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_101",
+        "x": 115,
+        "y": 317,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 115,
+                "targetY": 317
+            },
+            "result": {
+                "targetX": 390,
+                "targetY": 830
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_102",
+        "x": 427,
+        "y": 760,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 427,
+                "targetY": 760
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_102",
+        "x": 222,
+        "y": 380,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 222,
+                "targetY": 380
+            },
+            "result": {
+                "targetX": 427,
+                "targetY": 760
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_103",
+        "x": 467,
+        "y": 755,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 467,
+                "targetY": 755
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_103",
+        "x": 265,
+        "y": 396,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 265,
+                "targetY": 396
+            },
+            "result": {
+                "targetX": 467,
+                "targetY": 755
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_104",
+        "x": 487,
+        "y": 740,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 487,
+                "targetY": 740
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_104",
+        "x": 304,
+        "y": 421,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 304,
+                "targetY": 421
+            },
+            "result": {
+                "targetX": 487,
+                "targetY": 740
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_105",
+        "x": 555,
+        "y": 727,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 555,
+                "targetY": 727
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_105",
+        "x": 208,
+        "y": 467,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 208,
+                "targetY": 467
+            },
+            "result": {
+                "targetX": 555,
+                "targetY": 727
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_106",
+        "x": 572,
+        "y": 762,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 572,
+                "targetY": 762
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_106",
+        "x": 126,
+        "y": 484,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 126,
+                "targetY": 484
+            },
+            "result": {
+                "targetX": 572,
+                "targetY": 762
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_107",
+        "x": 617,
+        "y": 702,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 617,
+                "targetY": 702
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_107",
+        "x": 308,
+        "y": 466,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 308,
+                "targetY": 466
+            },
+            "result": {
+                "targetX": 617,
+                "targetY": 702
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_108",
+        "x": 630,
+        "y": 742,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 630,
+                "targetY": 742
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_108",
+        "x": 169,
+        "y": 533,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 169,
+                "targetY": 533
+            },
+            "result": {
+                "targetX": 630,
+                "targetY": 742
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_109",
+        "x": 280,
+        "y": 887,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 280,
+                "targetY": 887
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_109",
+        "x": 189,
+        "y": 279,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 189,
+                "targetY": 279
+            },
+            "result": {
+                "targetX": 280,
+                "targetY": 887
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_110",
+        "x": 665,
+        "y": 680,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 665,
+                "targetY": 680
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_110",
+        "x": 284,
+        "y": 516,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 284,
+                "targetY": 516
+            },
+            "result": {
+                "targetX": 665,
+                "targetY": 680
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_111",
+        "x": 720,
+        "y": 665,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 720,
+                "targetY": 665
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_111",
+        "x": 282,
+        "y": 558,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 282,
+                "targetY": 558
+            },
+            "result": {
+                "targetX": 720,
+                "targetY": 665
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_112",
+        "x": 737,
+        "y": 652,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 737,
+                "targetY": 652
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_112",
+        "x": 278,
+        "y": 579,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 278,
+                "targetY": 579
+            },
+            "result": {
+                "targetX": 737,
+                "targetY": 652
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_113",
+        "x": 325,
+        "y": 875,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 325,
+                "targetY": 875
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_113",
+        "x": 142,
+        "y": 266,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 142,
+                "targetY": 266
+            },
+            "result": {
+                "targetX": 325,
+                "targetY": 875
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_114",
+        "x": 750,
+        "y": 702,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 750,
+                "targetY": 702
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_114",
+        "x": 264,
+        "y": 609,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 264,
+                "targetY": 609
+            },
+            "result": {
+                "targetX": 750,
+                "targetY": 702
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_115",
+        "x": 677,
+        "y": 715,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 677,
+                "targetY": 715
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_115",
+        "x": 194,
+        "y": 588,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 194,
+                "targetY": 588
+            },
+            "result": {
+                "targetX": 677,
+                "targetY": 715
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    },
+    {
+        "id": "h_116",
+        "x": 512,
+        "y": 785,
+        "stages": [
+            "network"
+        ],
+        "positions": {
+            "network": {
+                "targetX": 512,
+                "targetY": 785
+            }
+        },
+        "active": false,
+        "color": "#616496"
+    },
+    {
+        "id": "d_116",
+        "x": 138,
+        "y": 425,
+        "stages": [
+            "reconstruction",
+            "result"
+        ],
+        "positions": {
+            "reconstruction": {
+                "targetX": 138,
+                "targetY": 425
+            },
+            "result": {
+                "targetX": 512,
+                "targetY": 785
+            }
+        },
+        "active": false,
+        "color": "#945238"
+    }
+];
+
+        // Dynamic link definitions by stage - including cross-stage connections
+        const stageLinks = {
+    "network": [
+        {
+            "source": "h_56",
+            "target": "h_57"
+        },
+        {
+            "source": "h_57",
+            "target": "h_58"
+        },
+        {
+            "source": "h_57",
+            "target": "h_59"
+        },
+        {
+            "source": "h_58",
+            "target": "1"
+        },
+        {
+            "source": "h_58",
+            "target": "3"
+        },
+        {
+            "source": "h_59",
+            "target": "h_60"
+        },
+        {
+            "source": "h_59",
+            "target": "h_61"
+        },
+        {
+            "source": "h_60",
+            "target": "2"
+        },
+        {
+            "source": "h_60",
+            "target": "6"
+        },
+        {
+            "source": "h_61",
+            "target": "h_62"
+        },
+        {
+            "source": "h_61",
+            "target": "h_63"
+        },
+        {
+            "source": "h_62",
+            "target": "4"
+        },
+        {
+            "source": "h_62",
+            "target": "5"
+        },
+        {
+            "source": "h_63",
+            "target": "h_64"
+        },
+        {
+            "source": "h_63",
+            "target": "h_68"
+        },
+        {
+            "source": "h_64",
+            "target": "h_65"
+        },
+        {
+            "source": "h_64",
+            "target": "h_74"
+        },
+        {
+            "source": "h_65",
+            "target": "h_66"
+        },
+        {
+            "source": "h_65",
+            "target": "14"
+        },
+        {
+            "source": "h_66",
+            "target": "h_75"
+        },
+        {
+            "source": "h_66",
+            "target": "h_67"
+        },
+        {
+            "source": "h_67",
+            "target": "h_78"
+        },
+        {
+            "source": "h_75",
+            "target": "13"
+        },
+        {
+            "source": "h_75",
+            "target": "15"
+        },
+        {
+            "source": "h_78",
+            "target": "16"
+        },
+        {
+            "source": "h_78",
+            "target": "17"
+        },
+        {
+            "source": "h_68",
+            "target": "h_69"
+        },
+        {
+            "source": "h_68",
+            "target": "7"
+        },
+        {
+            "source": "h_69",
+            "target": "h_70"
+        },
+        {
+            "source": "h_69",
+            "target": "h_71"
+        },
+        {
+            "source": "h_70",
+            "target": "8"
+        },
+        {
+            "source": "h_70",
+            "target": "12"
+        },
+        {
+            "source": "h_71",
+            "target": "9"
+        },
+        {
+            "source": "h_71",
+            "target": "h_72"
+        },
+        {
+            "source": "h_72",
+            "target": "h_73"
+        },
+        {
+            "source": "h_73",
+            "target": "10"
+        },
+        {
+            "source": "h_73",
+            "target": "11"
+        },
+        {
+            "source": "h_74",
+            "target": "h_76"
+        },
+        {
+            "source": "h_74",
+            "target": "21"
+        },
+        {
+            "source": "h_76",
+            "target": "h_77"
+        },
+        {
+            "source": "h_76",
+            "target": "19"
+        },
+        {
+            "source": "h_77",
+            "target": "h_79"
+        },
+        {
+            "source": "h_77",
+            "target": "h_83"
+        },
+        {
+            "source": "h_79",
+            "target": "h_80"
+        },
+        {
+            "source": "h_79",
+            "target": "h_82"
+        },
+        {
+            "source": "h_82",
+            "target": "20"
+        },
+        {
+            "source": "h_82",
+            "target": "22"
+        },
+        {
+            "source": "h_80",
+            "target": "h_81"
+        },
+        {
+            "source": "h_80",
+            "target": "18"
+        },
+        {
+            "source": "h_81",
+            "target": "23"
+        },
+        {
+            "source": "h_81",
+            "target": "h_85"
+        },
+        {
+            "source": "h_83",
+            "target": "h_84"
+        },
+        {
+            "source": "h_83",
+            "target": "24"
+        },
+        {
+            "source": "h_84",
+            "target": "h_88"
+        },
+        {
+            "source": "h_84",
+            "target": "h_90"
+        },
+        {
+            "source": "h_90",
+            "target": "27"
+        },
+        {
+            "source": "h_90",
+            "target": "28"
+        },
+        {
+            "source": "h_88",
+            "target": "26"
+        },
+        {
+            "source": "h_88",
+            "target": "h_93"
+        },
+        {
+            "source": "h_85",
+            "target": "h_86"
+        },
+        {
+            "source": "h_85",
+            "target": "34"
+        },
+        {
+            "source": "h_86",
+            "target": "h_87"
+        },
+        {
+            "source": "h_86",
+            "target": "h_89"
+        },
+        {
+            "source": "h_87",
+            "target": "25"
+        },
+        {
+            "source": "h_87",
+            "target": "30"
+        },
+        {
+            "source": "h_89",
+            "target": "h_91"
+        },
+        {
+            "source": "h_89",
+            "target": "h_92"
+        },
+        {
+            "source": "h_91",
+            "target": "29"
+        },
+        {
+            "source": "h_91",
+            "target": "31"
+        },
+        {
+            "source": "h_92",
+            "target": "h_94"
+        },
+        {
+            "source": "h_92",
+            "target": "h_98"
+        },
+        {
+            "source": "h_98",
+            "target": "36"
+        },
+        {
+            "source": "h_98",
+            "target": "37"
+        },
+        {
+            "source": "h_94",
+            "target": "33"
+        },
+        {
+            "source": "h_94",
+            "target": "h_95"
+        },
+        {
+            "source": "h_95",
+            "target": "35"
+        },
+        {
+            "source": "h_93",
+            "target": "h_96"
+        },
+        {
+            "source": "h_93",
+            "target": "44"
+        },
+        {
+            "source": "h_96",
+            "target": "32"
+        },
+        {
+            "source": "h_96",
+            "target": "h_97"
+        },
+        {
+            "source": "h_97",
+            "target": "h_99"
+        },
+        {
+            "source": "h_97",
+            "target": "38"
+        },
+        {
+            "source": "h_99",
+            "target": "h_100"
+        },
+        {
+            "source": "h_99",
+            "target": "h_109"
+        },
+        {
+            "source": "h_109",
+            "target": "46"
+        },
+        {
+            "source": "h_109",
+            "target": "h_113"
+        },
+        {
+            "source": "h_113",
+            "target": "48"
+        },
+        {
+            "source": "h_113",
+            "target": "49"
+        },
+        {
+            "source": "h_100",
+            "target": "h_101"
+        },
+        {
+            "source": "h_100",
+            "target": "h_102"
+        },
+        {
+            "source": "h_101",
+            "target": "39"
+        },
+        {
+            "source": "h_101",
+            "target": "42"
+        },
+        {
+            "source": "h_102",
+            "target": "40"
+        },
+        {
+            "source": "h_102",
+            "target": "h_103"
+        },
+        {
+            "source": "h_103",
+            "target": "h_104"
+        },
+        {
+            "source": "h_104",
+            "target": "h_105"
+        },
+        {
+            "source": "h_104",
+            "target": "h_116"
+        },
+        {
+            "source": "h_116",
+            "target": "51"
+        },
+        {
+            "source": "h_116",
+            "target": "54"
+        },
+        {
+            "source": "h_105",
+            "target": "h_106"
+        },
+        {
+            "source": "h_105",
+            "target": "h_107"
+        },
+        {
+            "source": "h_106",
+            "target": "41"
+        },
+        {
+            "source": "h_106",
+            "target": "45"
+        },
+        {
+            "source": "h_107",
+            "target": "h_108"
+        },
+        {
+            "source": "h_107",
+            "target": "h_110"
+        },
+        {
+            "source": "h_108",
+            "target": "43"
+        },
+        {
+            "source": "h_108",
+            "target": "47"
+        },
+        {
+            "source": "h_110",
+            "target": "h_111"
+        },
+        {
+            "source": "h_111",
+            "target": "h_112"
+        },
+        {
+            "source": "h_112",
+            "target": "h_114"
+        },
+        {
+            "source": "h_110",
+            "target": "h_115"
+        },
+        {
+            "source": "h_114",
+            "target": "50"
+        },
+        {
+            "source": "h_114",
+            "target": "53"
+        },
+        {
+            "source": "h_115",
+            "target": "52"
+        },
+        {
+            "source": "h_115",
+            "target": "55"
+        }
+    ],
+    "observables": [],
+    "graph": [],
+    "distance": [
+        {
+            "source": "3",
+            "target": "1"
+        },
+        {
+            "source": "3",
+            "target": "2"
+        },
+        {
+            "source": "3",
+            "target": "4"
+        },
+        {
+            "source": "3",
+            "target": "5"
+        },
+        {
+            "source": "3",
+            "target": "6"
+        },
+        {
+            "source": "3",
+            "target": "7"
+        },
+        {
+            "source": "3",
+            "target": "8"
+        },
+        {
+            "source": "3",
+            "target": "9"
+        },
+        {
+            "source": "3",
+            "target": "10"
+        },
+        {
+            "source": "3",
+            "target": "11"
+        },
+        {
+            "source": "3",
+            "target": "12"
+        },
+        {
+            "source": "3",
+            "target": "13"
+        },
+        {
+            "source": "3",
+            "target": "14"
+        },
+        {
+            "source": "3",
+            "target": "15"
+        },
+        {
+            "source": "3",
+            "target": "16"
+        },
+        {
+            "source": "3",
+            "target": "17"
+        },
+        {
+            "source": "3",
+            "target": "18"
+        },
+        {
+            "source": "3",
+            "target": "19"
+        },
+        {
+            "source": "3",
+            "target": "20"
+        },
+        {
+            "source": "3",
+            "target": "21"
+        },
+        {
+            "source": "3",
+            "target": "22"
+        },
+        {
+            "source": "3",
+            "target": "23"
+        },
+        {
+            "source": "3",
+            "target": "24"
+        },
+        {
+            "source": "3",
+            "target": "25"
+        },
+        {
+            "source": "3",
+            "target": "26"
+        },
+        {
+            "source": "3",
+            "target": "27"
+        },
+        {
+            "source": "3",
+            "target": "28"
+        },
+        {
+            "source": "3",
+            "target": "29"
+        },
+        {
+            "source": "3",
+            "target": "30"
+        },
+        {
+            "source": "3",
+            "target": "31"
+        },
+        {
+            "source": "3",
+            "target": "32"
+        },
+        {
+            "source": "3",
+            "target": "33"
+        },
+        {
+            "source": "3",
+            "target": "34"
+        },
+        {
+            "source": "3",
+            "target": "35"
+        },
+        {
+            "source": "3",
+            "target": "36"
+        },
+        {
+            "source": "3",
+            "target": "37"
+        },
+        {
+            "source": "3",
+            "target": "38"
+        },
+        {
+            "source": "3",
+            "target": "39"
+        },
+        {
+            "source": "3",
+            "target": "40"
+        },
+        {
+            "source": "3",
+            "target": "41"
+        },
+        {
+            "source": "3",
+            "target": "42"
+        },
+        {
+            "source": "3",
+            "target": "43"
+        },
+        {
+            "source": "3",
+            "target": "44"
+        },
+        {
+            "source": "3",
+            "target": "45"
+        },
+        {
+            "source": "3",
+            "target": "46"
+        },
+        {
+            "source": "3",
+            "target": "47"
+        },
+        {
+            "source": "3",
+            "target": "48"
+        },
+        {
+            "source": "3",
+            "target": "49"
+        },
+        {
+            "source": "3",
+            "target": "50"
+        },
+        {
+            "source": "3",
+            "target": "51"
+        },
+        {
+            "source": "3",
+            "target": "52"
+        },
+        {
+            "source": "3",
+            "target": "53"
+        },
+        {
+            "source": "3",
+            "target": "54"
+        },
+        {
+            "source": "3",
+            "target": "55"
+        }
+    ],
+    "reconstruction": [
+        {
+            "source": "d_56",
+            "target": "d_57"
+        },
+        {
+            "source": "d_57",
+            "target": "d_58"
+        },
+        {
+            "source": "d_57",
+            "target": "d_59"
+        },
+        {
+            "source": "d_58",
+            "target": "1"
+        },
+        {
+            "source": "d_58",
+            "target": "3"
+        },
+        {
+            "source": "d_59",
+            "target": "d_60"
+        },
+        {
+            "source": "d_59",
+            "target": "d_61"
+        },
+        {
+            "source": "d_60",
+            "target": "2"
+        },
+        {
+            "source": "d_60",
+            "target": "6"
+        },
+        {
+            "source": "d_61",
+            "target": "d_62"
+        },
+        {
+            "source": "d_61",
+            "target": "d_63"
+        },
+        {
+            "source": "d_62",
+            "target": "4"
+        },
+        {
+            "source": "d_62",
+            "target": "5"
+        },
+        {
+            "source": "d_63",
+            "target": "d_64"
+        },
+        {
+            "source": "d_63",
+            "target": "d_68"
+        },
+        {
+            "source": "d_64",
+            "target": "d_65"
+        },
+        {
+            "source": "d_64",
+            "target": "d_74"
+        },
+        {
+            "source": "d_65",
+            "target": "d_66"
+        },
+        {
+            "source": "d_65",
+            "target": "14"
+        },
+        {
+            "source": "d_66",
+            "target": "d_75"
+        },
+        {
+            "source": "d_66",
+            "target": "d_67"
+        },
+        {
+            "source": "d_67",
+            "target": "d_78"
+        },
+        {
+            "source": "d_75",
+            "target": "13"
+        },
+        {
+            "source": "d_75",
+            "target": "15"
+        },
+        {
+            "source": "d_78",
+            "target": "16"
+        },
+        {
+            "source": "d_78",
+            "target": "17"
+        },
+        {
+            "source": "d_68",
+            "target": "d_69"
+        },
+        {
+            "source": "d_68",
+            "target": "7"
+        },
+        {
+            "source": "d_69",
+            "target": "d_70"
+        },
+        {
+            "source": "d_69",
+            "target": "d_71"
+        },
+        {
+            "source": "d_70",
+            "target": "8"
+        },
+        {
+            "source": "d_70",
+            "target": "12"
+        },
+        {
+            "source": "d_71",
+            "target": "9"
+        },
+        {
+            "source": "d_71",
+            "target": "d_72"
+        },
+        {
+            "source": "d_72",
+            "target": "d_73"
+        },
+        {
+            "source": "d_73",
+            "target": "10"
+        },
+        {
+            "source": "d_73",
+            "target": "11"
+        },
+        {
+            "source": "d_74",
+            "target": "d_76"
+        },
+        {
+            "source": "d_74",
+            "target": "21"
+        },
+        {
+            "source": "d_76",
+            "target": "d_77"
+        },
+        {
+            "source": "d_76",
+            "target": "19"
+        },
+        {
+            "source": "d_77",
+            "target": "d_79"
+        },
+        {
+            "source": "d_77",
+            "target": "d_83"
+        },
+        {
+            "source": "d_79",
+            "target": "d_80"
+        },
+        {
+            "source": "d_79",
+            "target": "d_82"
+        },
+        {
+            "source": "d_82",
+            "target": "20"
+        },
+        {
+            "source": "d_82",
+            "target": "22"
+        },
+        {
+            "source": "d_80",
+            "target": "d_81"
+        },
+        {
+            "source": "d_80",
+            "target": "18"
+        },
+        {
+            "source": "d_81",
+            "target": "23"
+        },
+        {
+            "source": "d_81",
+            "target": "d_85"
+        },
+        {
+            "source": "d_83",
+            "target": "d_84"
+        },
+        {
+            "source": "d_83",
+            "target": "24"
+        },
+        {
+            "source": "d_84",
+            "target": "d_88"
+        },
+        {
+            "source": "d_84",
+            "target": "d_90"
+        },
+        {
+            "source": "d_90",
+            "target": "27"
+        },
+        {
+            "source": "d_90",
+            "target": "28"
+        },
+        {
+            "source": "d_88",
+            "target": "26"
+        },
+        {
+            "source": "d_88",
+            "target": "d_93"
+        },
+        {
+            "source": "d_85",
+            "target": "d_86"
+        },
+        {
+            "source": "d_85",
+            "target": "34"
+        },
+        {
+            "source": "d_86",
+            "target": "d_87"
+        },
+        {
+            "source": "d_86",
+            "target": "d_89"
+        },
+        {
+            "source": "d_87",
+            "target": "25"
+        },
+        {
+            "source": "d_87",
+            "target": "30"
+        },
+        {
+            "source": "d_89",
+            "target": "d_91"
+        },
+        {
+            "source": "d_89",
+            "target": "d_92"
+        },
+        {
+            "source": "d_91",
+            "target": "29"
+        },
+        {
+            "source": "d_91",
+            "target": "31"
+        },
+        {
+            "source": "d_92",
+            "target": "d_94"
+        },
+        {
+            "source": "d_92",
+            "target": "d_98"
+        },
+        {
+            "source": "d_98",
+            "target": "36"
+        },
+        {
+            "source": "d_98",
+            "target": "37"
+        },
+        {
+            "source": "d_94",
+            "target": "33"
+        },
+        {
+            "source": "d_94",
+            "target": "d_95"
+        },
+        {
+            "source": "d_95",
+            "target": "35"
+        },
+        {
+            "source": "d_93",
+            "target": "d_96"
+        },
+        {
+            "source": "d_93",
+            "target": "44"
+        },
+        {
+            "source": "d_96",
+            "target": "32"
+        },
+        {
+            "source": "d_96",
+            "target": "d_97"
+        },
+        {
+            "source": "d_97",
+            "target": "d_99"
+        },
+        {
+            "source": "d_97",
+            "target": "38"
+        },
+        {
+            "source": "d_99",
+            "target": "d_100"
+        },
+        {
+            "source": "d_99",
+            "target": "d_109"
+        },
+        {
+            "source": "d_109",
+            "target": "46"
+        },
+        {
+            "source": "d_109",
+            "target": "d_113"
+        },
+        {
+            "source": "d_113",
+            "target": "48"
+        },
+        {
+            "source": "d_113",
+            "target": "49"
+        },
+        {
+            "source": "d_100",
+            "target": "d_101"
+        },
+        {
+            "source": "d_100",
+            "target": "d_102"
+        },
+        {
+            "source": "d_101",
+            "target": "39"
+        },
+        {
+            "source": "d_101",
+            "target": "42"
+        },
+        {
+            "source": "d_102",
+            "target": "40"
+        },
+        {
+            "source": "d_102",
+            "target": "d_103"
+        },
+        {
+            "source": "d_103",
+            "target": "d_104"
+        },
+        {
+            "source": "d_104",
+            "target": "d_105"
+        },
+        {
+            "source": "d_104",
+            "target": "d_116"
+        },
+        {
+            "source": "d_116",
+            "target": "51"
+        },
+        {
+            "source": "d_116",
+            "target": "54"
+        },
+        {
+            "source": "d_105",
+            "target": "d_106"
+        },
+        {
+            "source": "d_105",
+            "target": "d_107"
+        },
+        {
+            "source": "d_106",
+            "target": "41"
+        },
+        {
+            "source": "d_106",
+            "target": "45"
+        },
+        {
+            "source": "d_107",
+            "target": "d_108"
+        },
+        {
+            "source": "d_107",
+            "target": "d_110"
+        },
+        {
+            "source": "d_108",
+            "target": "43"
+        },
+        {
+            "source": "d_108",
+            "target": "47"
+        },
+        {
+            "source": "d_110",
+            "target": "d_111"
+        },
+        {
+            "source": "d_111",
+            "target": "d_112"
+        },
+        {
+            "source": "d_112",
+            "target": "d_114"
+        },
+        {
+            "source": "d_110",
+            "target": "d_115"
+        },
+        {
+            "source": "d_114",
+            "target": "50"
+        },
+        {
+            "source": "d_114",
+            "target": "53"
+        },
+        {
+            "source": "d_115",
+            "target": "52"
+        },
+        {
+            "source": "d_115",
+            "target": "55"
+        }
+    ],
+    "result": [
+        {
+            "source": "d_56",
+            "target": "d_57"
+        },
+        {
+            "source": "d_57",
+            "target": "d_58"
+        },
+        {
+            "source": "d_57",
+            "target": "d_59"
+        },
+        {
+            "source": "d_58",
+            "target": "1"
+        },
+        {
+            "source": "d_58",
+            "target": "3"
+        },
+        {
+            "source": "d_59",
+            "target": "d_60"
+        },
+        {
+            "source": "d_59",
+            "target": "d_61"
+        },
+        {
+            "source": "d_60",
+            "target": "2"
+        },
+        {
+            "source": "d_60",
+            "target": "6"
+        },
+        {
+            "source": "d_61",
+            "target": "d_62"
+        },
+        {
+            "source": "d_61",
+            "target": "d_63"
+        },
+        {
+            "source": "d_62",
+            "target": "4"
+        },
+        {
+            "source": "d_62",
+            "target": "5"
+        },
+        {
+            "source": "d_63",
+            "target": "d_64"
+        },
+        {
+            "source": "d_63",
+            "target": "d_68"
+        },
+        {
+            "source": "d_64",
+            "target": "d_65"
+        },
+        {
+            "source": "d_64",
+            "target": "d_74"
+        },
+        {
+            "source": "d_65",
+            "target": "d_66"
+        },
+        {
+            "source": "d_65",
+            "target": "14"
+        },
+        {
+            "source": "d_66",
+            "target": "d_75"
+        },
+        {
+            "source": "d_66",
+            "target": "d_67"
+        },
+        {
+            "source": "d_67",
+            "target": "d_78"
+        },
+        {
+            "source": "d_75",
+            "target": "13"
+        },
+        {
+            "source": "d_75",
+            "target": "15"
+        },
+        {
+            "source": "d_78",
+            "target": "16"
+        },
+        {
+            "source": "d_78",
+            "target": "17"
+        },
+        {
+            "source": "d_68",
+            "target": "d_69"
+        },
+        {
+            "source": "d_68",
+            "target": "7"
+        },
+        {
+            "source": "d_69",
+            "target": "d_70"
+        },
+        {
+            "source": "d_69",
+            "target": "d_71"
+        },
+        {
+            "source": "d_70",
+            "target": "8"
+        },
+        {
+            "source": "d_70",
+            "target": "12"
+        },
+        {
+            "source": "d_71",
+            "target": "9"
+        },
+        {
+            "source": "d_71",
+            "target": "d_72"
+        },
+        {
+            "source": "d_72",
+            "target": "d_73"
+        },
+        {
+            "source": "d_73",
+            "target": "10"
+        },
+        {
+            "source": "d_73",
+            "target": "11"
+        },
+        {
+            "source": "d_74",
+            "target": "d_76"
+        },
+        {
+            "source": "d_74",
+            "target": "21"
+        },
+        {
+            "source": "d_76",
+            "target": "d_77"
+        },
+        {
+            "source": "d_76",
+            "target": "19"
+        },
+        {
+            "source": "d_77",
+            "target": "d_79"
+        },
+        {
+            "source": "d_77",
+            "target": "d_83"
+        },
+        {
+            "source": "d_79",
+            "target": "d_80"
+        },
+        {
+            "source": "d_79",
+            "target": "d_82"
+        },
+        {
+            "source": "d_82",
+            "target": "20"
+        },
+        {
+            "source": "d_82",
+            "target": "22"
+        },
+        {
+            "source": "d_80",
+            "target": "d_81"
+        },
+        {
+            "source": "d_80",
+            "target": "18"
+        },
+        {
+            "source": "d_81",
+            "target": "23"
+        },
+        {
+            "source": "d_81",
+            "target": "d_85"
+        },
+        {
+            "source": "d_83",
+            "target": "d_84"
+        },
+        {
+            "source": "d_83",
+            "target": "24"
+        },
+        {
+            "source": "d_84",
+            "target": "d_88"
+        },
+        {
+            "source": "d_84",
+            "target": "d_90"
+        },
+        {
+            "source": "d_90",
+            "target": "27"
+        },
+        {
+            "source": "d_90",
+            "target": "28"
+        },
+        {
+            "source": "d_88",
+            "target": "26"
+        },
+        {
+            "source": "d_88",
+            "target": "d_93"
+        },
+        {
+            "source": "d_85",
+            "target": "d_86"
+        },
+        {
+            "source": "d_85",
+            "target": "34"
+        },
+        {
+            "source": "d_86",
+            "target": "d_87"
+        },
+        {
+            "source": "d_86",
+            "target": "d_89"
+        },
+        {
+            "source": "d_87",
+            "target": "25"
+        },
+        {
+            "source": "d_87",
+            "target": "30"
+        },
+        {
+            "source": "d_89",
+            "target": "d_91"
+        },
+        {
+            "source": "d_89",
+            "target": "d_92"
+        },
+        {
+            "source": "d_91",
+            "target": "29"
+        },
+        {
+            "source": "d_91",
+            "target": "31"
+        },
+        {
+            "source": "d_92",
+            "target": "d_94"
+        },
+        {
+            "source": "d_92",
+            "target": "d_98"
+        },
+        {
+            "source": "d_98",
+            "target": "36"
+        },
+        {
+            "source": "d_98",
+            "target": "37"
+        },
+        {
+            "source": "d_94",
+            "target": "33"
+        },
+        {
+            "source": "d_94",
+            "target": "d_95"
+        },
+        {
+            "source": "d_95",
+            "target": "35"
+        },
+        {
+            "source": "d_93",
+            "target": "d_96"
+        },
+        {
+            "source": "d_93",
+            "target": "44"
+        },
+        {
+            "source": "d_96",
+            "target": "32"
+        },
+        {
+            "source": "d_96",
+            "target": "d_97"
+        },
+        {
+            "source": "d_97",
+            "target": "d_99"
+        },
+        {
+            "source": "d_97",
+            "target": "38"
+        },
+        {
+            "source": "d_99",
+            "target": "d_100"
+        },
+        {
+            "source": "d_99",
+            "target": "d_109"
+        },
+        {
+            "source": "d_109",
+            "target": "46"
+        },
+        {
+            "source": "d_109",
+            "target": "d_113"
+        },
+        {
+            "source": "d_113",
+            "target": "48"
+        },
+        {
+            "source": "d_113",
+            "target": "49"
+        },
+        {
+            "source": "d_100",
+            "target": "d_101"
+        },
+        {
+            "source": "d_100",
+            "target": "d_102"
+        },
+        {
+            "source": "d_101",
+            "target": "39"
+        },
+        {
+            "source": "d_101",
+            "target": "42"
+        },
+        {
+            "source": "d_102",
+            "target": "40"
+        },
+        {
+            "source": "d_102",
+            "target": "d_103"
+        },
+        {
+            "source": "d_103",
+            "target": "d_104"
+        },
+        {
+            "source": "d_104",
+            "target": "d_105"
+        },
+        {
+            "source": "d_104",
+            "target": "d_116"
+        },
+        {
+            "source": "d_116",
+            "target": "51"
+        },
+        {
+            "source": "d_116",
+            "target": "54"
+        },
+        {
+            "source": "d_105",
+            "target": "d_106"
+        },
+        {
+            "source": "d_105",
+            "target": "d_107"
+        },
+        {
+            "source": "d_106",
+            "target": "41"
+        },
+        {
+            "source": "d_106",
+            "target": "45"
+        },
+        {
+            "source": "d_107",
+            "target": "d_108"
+        },
+        {
+            "source": "d_107",
+            "target": "d_110"
+        },
+        {
+            "source": "d_108",
+            "target": "43"
+        },
+        {
+            "source": "d_108",
+            "target": "47"
+        },
+        {
+            "source": "d_110",
+            "target": "d_111"
+        },
+        {
+            "source": "d_111",
+            "target": "d_112"
+        },
+        {
+            "source": "d_112",
+            "target": "d_114"
+        },
+        {
+            "source": "d_110",
+            "target": "d_115"
+        },
+        {
+            "source": "d_114",
+            "target": "50"
+        },
+        {
+            "source": "d_114",
+            "target": "53"
+        },
+        {
+            "source": "d_115",
+            "target": "52"
+        },
+        {
+            "source": "d_115",
+            "target": "55"
+        }
+    ]
+};
+
+        let currentStage = '';
+        let currentLinks = [];
+        let previousStage = '';
+
+        // Set up SVG
+        const svg = d3.select('#graph');
+        const width = 600;
+        const height = 500;
+
+        // Create groups for links and nodes
+        const linkGroup = svg.append('g').attr('class', 'links');
+        const nodeGroup = svg.append('g').attr('class', 'nodes');
+
+        // Create links (will be dynamically updated)
+        let linkElements = linkGroup.selectAll('.link');
+
+        // Create node groups
+        const nodeElements = nodeGroup.selectAll('.node-group')
+            .data(nodes)
+            .enter()
+            .append('g')
+            .attr('class', 'node-group')
+            .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+        // Add circles to nodes
+        nodeElements.append('circle')
+            .attr('class', 'node')
+            .attr('r', 0)
+            .attr('fill', d => d.color)
+            .attr('stroke', 'white')
+            .attr('stroke-width', 2);
+
+        // Add labels to nodes
+        nodeElements.append('text')
+            .attr('class', 'node-label')
+            .attr('dy', '.35em')
+            .text(d => d.label)
+            .style('opacity', 0);
+
+        // Scroll handling
+        const textContent = document.getElementById('textContent');
+        const scrollProgress = document.getElementById('scroll-progress');
+
+        function updateGraph() {
+            const scrollTop = textContent.scrollTop;
+            const scrollHeight = textContent.scrollHeight - textContent.clientHeight;
+            const progress = Math.min(scrollTop / scrollHeight, 1);
+
+            // Update progress indicator
+            scrollProgress.textContent = Math.round(progress * 100) + '%';
+
+            // Get current stage
+            const sections = document.querySelectorAll('.section');
+            let newStage = '';
+
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                const containerRect = textContent.getBoundingClientRect();
+                
+                // Check if section is primarily visible (center-focused)
+                const sectionCenter = rect.top + rect.height / 2;
+                const containerCenter = containerRect.top + containerRect.height / 2;
+                const threshold = containerRect.height * 0.3;
+                
+                if (Math.abs(sectionCenter - containerCenter) < threshold) {
+                    newStage = section.getAttribute('data-node');
+                }
+            });
+
+            // If no stage is visible, keep the previous stage
+            if (newStage === '' && currentStage !== '') {
+                newStage = currentStage;
+            }
+
+            // Update stage if changed
+            if (newStage !== currentStage && newStage !== '') {
+                previousStage = currentStage;
+                currentStage = newStage;
+                updateStage();
+            }
+
+            // Animate node movements
+            animateNodes();
+        }
+
+        function updateStage() {
+            // Reset all nodes - check if current stage is in their stages array
+            nodes.forEach(node => {
+                node.active = node.stages.includes(currentStage);
+                
+                // Update target position based on current stage
+                if (node.active && node.positions[currentStage]) {
+                    node.targetX = node.positions[currentStage].targetX;
+                    node.targetY = node.positions[currentStage].targetY;
+                }
+            });
+
+            // Update links for current stage
+            currentLinks = currentStage ? stageLinks[currentStage] || [] : [];
+
+            // Update link elements with proper data binding
+            linkElements = linkGroup.selectAll('.link')
+                .data(currentLinks, d => `${d.source}-${d.target}`);
+
+            // Remove old links
+            linkElements.exit()
+                .transition()
+                .duration(300)
+                .style('opacity', 0)
+                .remove();
+
+            // Add new links
+            const newLinks = linkElements.enter()
+                .append('line')
+                .attr('class', 'link')
+                .style('opacity', 1)
+                .attr('stroke', '#ffffff')
+                .attr('stroke-width', 3)
+                .attr('x1', d => nodes.find(n => n.id === d.source).x)
+                .attr('y1', d => nodes.find(n => n.id === d.source).y)
+                .attr('x2', d => nodes.find(n => n.id === d.target).x)
+                .attr('y2', d => nodes.find(n => n.id === d.target).y);
+
+            // Merge new and existing links
+            linkElements = newLinks.merge(linkElements);
+
+            // Animate all links to visible
+            linkElements
+                .transition()
+                .duration(500)
+                .style('opacity', 1)
+                .attr('x1', d => nodes.find(n => n.id === d.source).x)
+                .attr('y1', d => nodes.find(n => n.id === d.source).y)
+                .attr('x2', d => nodes.find(n => n.id === d.target).x)
+                .attr('y2', d => nodes.find(n => n.id === d.target).y);
+
+            // Animate nodes
+            nodeElements.selectAll('.node')
+                .transition()
+                .duration(500)
+                .attr('r', d => d.active ? 10 : 0)
+                .attr('stroke-width', d => d.active ? 3 : 2);
+
+            // Animate labels
+            nodeElements.selectAll('.node-label')
+                .transition()
+                .duration(500)
+                .style('opacity', d => d.active ? 1 : 0);
+        }
+
+        function animateNodes() {
+            // Move nodes toward their target positions
+            nodes.forEach(node => {
+                if (node.active && (node.x !== node.targetX || node.y !== node.targetY)) {
+                    const dx = node.targetX - node.x;
+                    const dy = node.targetY - node.y;
+                    node.x += dx * 0.02;
+                    node.y += dy * 0.02;
+                }
+            });
+
+            // Update node positions
+            nodeElements
+                .transition()
+                .duration(100)
+                .attr('transform', d => `translate(${d.x}, ${d.y})`);
+
+            // Update link positions
+            if (linkElements && linkElements.size() > 0) {
+                linkElements
+                    .transition()
+                    .duration(100)
+                    .attr('x1', d => nodes.find(n => n.id === d.source).x)
+                    .attr('y1', d => nodes.find(n => n.id === d.source).y)
+                    .attr('x2', d => nodes.find(n => n.id === d.target).x)
+                    .attr('y2', d => nodes.find(n => n.id === d.target).y);
+            }
+        }
+
+        // Add scroll listener with animation loop
+        textContent.addEventListener('scroll', updateGraph);
+        
+        // Continuous animation for node movement
+        function animate() {
+            if (currentStage) {
+                animateNodes();
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Add hover effects for nodes
+        nodeElements
+            .on('mouseenter', function(event, d) {
+                if (d.active) {
+                    d3.select(this).select('.node')
+                        .transition()
+                        .duration(200)
+                        .attr('r', 12)
+                        .attr('stroke-width', 4);
+                }
+            })
+            .on('mouseleave', function(event, d) {
+                if (d.active) {
+                    d3.select(this).select('.node')
+                        .transition()
+                        .duration(200)
+                        .attr('r', 10)
+                        .attr('stroke-width', 3);
+                }
+            });
+
+        // Initial update
+        updateGraph();
+    </script>
+</body>
+</html>
