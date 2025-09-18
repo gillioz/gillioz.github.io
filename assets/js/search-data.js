@@ -46,6 +46,9 @@ ninja.data = [{
           section: "News",},{id: "news-another-remote-talk-this-time-about-my-recent-paper-on-the-conformal-bootstrap-slides-are-available-here",
           title: 'Another remote talk, this time about my recent paper on the conformal bootstrap....',
           description: "",
+          section: "News",},{id: "news-a-new-page-has-been-added-to-illustrate-an-on-going-project-in-french-the-goal-is-to-use-smart-meter-data-to-gain-knowledge-about-electrical-distribution-networks",
+          title: 'A new page has been added to illustrate an on-going project (in french)....',
+          description: "",
           section: "News",},{id: "projects-deep-learning-morpion-solitaire",
           title: 'Deep learning Morpion Solitaire',
           description: "A cool machine learning project, but currently in hibernation",
@@ -56,6 +59,11 @@ ninja.data = [{
           description: "Interactive tool for anomaly detection in the Swiss transmission grid",
           section: "Projects",handler: () => {
               window.location.href = "/projects/SwissCyberGrid.html";
+            },},{id: "projects-irreel",
+          title: 'IRREEL',
+          description: "Improved Resistance and Reactance Estimation of Electrical Lines",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/irreel.html";
             },},{id: "projects-conformal-field-theory-in-momentum-space",
           title: 'Conformal field theory in momentum space',
           description: "Developing a new approach to conformal field theory using the momentum-space representation of correlation functions",
