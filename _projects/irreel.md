@@ -7,4 +7,3 @@ importance: 2
 redirect: https://gillioz.github.io/irreel
 category: "Power grids"
 ---
-

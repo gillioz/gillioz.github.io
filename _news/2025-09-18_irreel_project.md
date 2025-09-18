@@ -6,7 +6,3 @@ related_posts: false
 ---
 
 A new [page](/irreel) has been added to illustrate an on-going [project](/projects) (in french). The goal is to use Smart Meter data to gain knowledge about electrical distribution networks.
-
-
-
-
