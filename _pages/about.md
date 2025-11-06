@@ -5,7 +5,7 @@ permalink: /
 subtitle: Theoretical physics | Machine learning | Software engineering
 profile:
   align: right
-  image: Portrait_oct_2023.jpg
+  image: portrait.jpg
   image_circular: true
 
 selected_papers: true # includes a list of papers marked as "selected={true}"
