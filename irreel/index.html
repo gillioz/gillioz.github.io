@@ -19,7 +19,12 @@
           system-ui,
           -apple-system,
           sans-serif;
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #020617 100%);
+        background: linear-gradient(
+          135deg,
+          #1e293b 0%,
+          #0f172a 50%,
+          #020617 100%
+        );
         color: #e2e8f0;
         line-height: 1.6;
       }
@@ -30,7 +35,11 @@
         left: 0;
         width: 100%;
         height: 100vh;
-        background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+        background: linear-gradient(
+          145deg,
+          rgba(30, 41, 59, 0.8) 0%,
+          rgba(15, 23, 42, 0.9) 100%
+        );
         z-index: 1;
       }
 
@@ -42,7 +51,8 @@
         right: 0;
         bottom: 0;
         background-image:
-          linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+          linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
         background-size: 20px 20px;
         pointer-events: none;
       }
@@ -116,7 +126,12 @@
         font-size: 2.5rem;
         margin-bottom: 1.25rem;
         font-weight: 700;
-        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #94a3b8 100%);
+        background: linear-gradient(
+          135deg,
+          #e2e8f0 0%,
+          #cbd5e1 50%,
+          #94a3b8 100%
+        );
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -242,13 +257,22 @@
     <div class="scrollable-content">
       <div class="section" data-node="network">
         <h1>IRREEL</h1>
-        <h3>Improved Resistance and Reactance Estimation of Electrical Lines</h3>
+        <h3>
+          Improved Resistance and Reactance Estimation of Electrical Lines
+        </h3>
         <h2>Le contexte</h2>
-        <p>Voici un réseau de distribution électrique à basse tension correspondant à un quartier résidentiel avec une cinquantaine d'habitations.</p>
         <p>
-          L'opérateur du réseau aimerait modéliser ce quartier dans le but de l'incorporer à sa stratégie de surveillance et de pilotage du réseau.
+          Voici un réseau de distribution électrique à basse tension
+          correspondant à un quartier résidentiel avec une cinquantaine
+          d'habitations.
         </p>
-        <p>Comment procéder sans mener une campagne de mesures sur le terrain?</p>
+        <p>
+          L'opérateur du réseau aimerait modéliser ce quartier dans le but de
+          l'incorporer à sa stratégie de surveillance et de pilotage du réseau.
+        </p>
+        <p>
+          Comment procéder sans mener une campagne de mesures sur le terrain?
+        </p>
       </div>
 
       <div class="section" data-node="observables">
@@ -256,42 +280,70 @@
         <p>En pratique, on se retrouve souvent dans la situation suivante:</p>
         <ul>
           <li>Les impédances des lignes ne sont pas mesurées précisément.</li>
-          <li>Parfois la topologie même du réseau n'est pas complètement connue.</li>
+          <li>
+            Parfois la topologie même du réseau n'est pas complètement connue.
+          </li>
         </ul>
-        <p>Par contre, on a désormais accès aux données de consommation de chacune des habitations grâce à leurs <b>Smart Meters</b>.</p>
+        <p>
+          Par contre, on a désormais accès aux données de consommation de
+          chacune des habitations grâce à leurs <b>Smart Meters</b>.
+        </p>
       </div>
 
       <div class="section" data-node="graph">
         <h2>Algorithme de reconstruction</h2>
         <p>
-          Nous avons mis au point un algorithme de reconstruction du réseau sur la base de données de puissance active et réactive, ainsi que de
+          Nous avons mis au point un algorithme de reconstruction du réseau sur
+          la base de données de puissance active et réactive, ainsi que de
           tension, mesurées dans chaque habitation.
         </p>
-        <p>Ces données nous fournissent une représentation abstraite du réseau sous la forme d'un graphe.</p>
+        <p>
+          Ces données nous fournissent une représentation abstraite du réseau
+          sous la forme d'un graphe.
+        </p>
       </div>
 
       <div class="section" data-node="distance">
         <h2>Étape 1: résistances effectives</h2>
-        <p>Dans un premier temps, notre algorithme calcule une résistance effective entre chaque paire d'habitations.</p>
         <p>
-          Ce calcul est basé sur une analyse statistique des profils de consommation et de tension à chaque noeud. Plus la quantité de données à
-          disposition est importante, plus le calcul est précis.
+          Dans un premier temps, notre algorithme calcule une résistance
+          effective entre chaque paire d'habitations.
+        </p>
+        <p>
+          Ce calcul est basé sur une analyse statistique des profils de
+          consommation et de tension à chaque noeud. Plus la quantité de données
+          à disposition est importante, plus le calcul est précis.
         </p>
       </div>
 
       <div class="section" data-node="reconstruction">
         <h2>Étape 2: Reconstruction de la topologie du réseau</h2>
-        <p>La topologie du réseau est ensuire reconstruite à partir des résistances effectives calculées précédemment.</p>
-        <p>On peut ainsi reconstruire toutes les connections et calculer leur résistance et leur réactance.</p>
+        <p>
+          La topologie du réseau est ensuire reconstruite à partir des
+          résistances effectives calculées précédemment.
+        </p>
+        <p>
+          On peut ainsi reconstruire toutes les connections et calculer leur
+          résistance et leur réactance.
+        </p>
       </div>
 
       <div class="section" data-node="result">
         <h2>Résultat</h2>
-        <p>Nous obtenons finalement un modèle de réseau avec une estimation précise des impédances de chaque ligne.</p>
+        <p>
+          Nous obtenons finalement un modèle de réseau avec une estimation
+          précise des impédances de chaque ligne.
+        </p>
         <p>Intéressé·es à en savoir plus? N'hésitez pas à nous contacter:</p>
         <ul>
-          <li>Robin Delabays: <a href="mailto:robin.delabays@hevs.ch">robin.delabays@hevs.ch</a></li>
-          <li>Marc Gillioz: <a href="mailto:marc.gillioz@hevs.ch">marc.gillioz@hevs.ch</a></li>
+          <li>
+            Robin Delabays:
+            <a href="mailto:robin.delabays@hevs.ch">robin.delabays@hevs.ch</a>
+          </li>
+          <li>
+            Marc Gillioz:
+            <a href="mailto:marc.gillioz@hevs.ch">marc.gillioz@hevs.ch</a>
+          </li>
         </ul>
       </div>
     </div>
@@ -304,7 +356,14 @@
           label: "1",
           x: 127,
           y: 112,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 127,
@@ -339,7 +398,14 @@
           label: "2",
           x: 145,
           y: 135,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 145,
@@ -374,7 +440,14 @@
           label: "3",
           x: 95,
           y: 55,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 95,
@@ -409,7 +482,14 @@
           label: "4",
           x: 180,
           y: 217,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 180,
@@ -444,7 +524,14 @@
           label: "5",
           x: 197,
           y: 260,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 197,
@@ -479,7 +566,14 @@
           label: "6",
           x: 165,
           y: 172,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 165,
@@ -514,7 +608,14 @@
           label: "7",
           x: 232,
           y: 240,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 232,
@@ -549,7 +650,14 @@
           label: "8",
           x: 260,
           y: 180,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 260,
@@ -584,7 +692,14 @@
           label: "9",
           x: 405,
           y: 140,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 405,
@@ -619,7 +734,14 @@
           label: "10",
           x: 462,
           y: 87,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 462,
@@ -654,7 +776,14 @@
           label: "11",
           x: 500,
           y: 55,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 500,
@@ -689,7 +818,14 @@
           label: "12",
           x: 322,
           y: 147,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 322,
@@ -724,7 +860,14 @@
           label: "13",
           x: 395,
           y: 442,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 395,
@@ -759,7 +902,14 @@
           label: "14",
           x: 307,
           y: 437,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 307,
@@ -794,7 +944,14 @@
           label: "15",
           x: 450,
           y: 422,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 450,
@@ -829,7 +986,14 @@
           label: "16",
           x: 505,
           y: 410,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 505,
@@ -864,7 +1028,14 @@
           label: "17",
           x: 560,
           y: 372,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 560,
@@ -899,7 +1070,14 @@
           label: "18",
           x: 287,
           y: 565,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 287,
@@ -934,7 +1112,14 @@
           label: "19",
           x: 217,
           y: 492,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 217,
@@ -969,7 +1154,14 @@
           label: "20",
           x: 277,
           y: 532,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 277,
@@ -1004,7 +1196,14 @@
           label: "21",
           x: 200,
           y: 460,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 200,
@@ -1039,7 +1238,14 @@
           label: "22",
           x: 247,
           y: 510,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 247,
@@ -1074,7 +1280,14 @@
           label: "23",
           x: 310,
           y: 600,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 310,
@@ -1109,7 +1322,14 @@
           label: "24",
           x: 60,
           y: 597,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 60,
@@ -1144,7 +1364,14 @@
           label: "25",
           x: 445,
           y: 580,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 445,
@@ -1179,7 +1406,14 @@
           label: "26",
           x: 150,
           y: 702,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 150,
@@ -1214,7 +1448,14 @@
           label: "27",
           x: 92,
           y: 720,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 92,
@@ -1249,7 +1490,14 @@
           label: "28",
           x: 75,
           y: 660,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 75,
@@ -1284,7 +1532,14 @@
           label: "29",
           x: 535,
           y: 552,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 535,
@@ -1319,7 +1574,14 @@
           label: "30",
           x: 395,
           y: 592,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 395,
@@ -1354,7 +1616,14 @@
           label: "31",
           x: 482,
           y: 565,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 482,
@@ -1389,7 +1658,14 @@
           label: "32",
           x: 150,
           y: 800,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 150,
@@ -1424,7 +1700,14 @@
           label: "33",
           x: 647,
           y: 512,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 647,
@@ -1459,7 +1742,14 @@
           label: "34",
           x: 365,
           y: 600,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 365,
@@ -1494,7 +1784,14 @@
           label: "35",
           x: 705,
           y: 477,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 705,
@@ -1529,7 +1826,14 @@
           label: "36",
           x: 615,
           y: 522,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 615,
@@ -1564,7 +1868,14 @@
           label: "37",
           x: 547,
           y: 537,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 547,
@@ -1599,7 +1910,14 @@
           label: "38",
           x: 165,
           y: 835,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 165,
@@ -1634,7 +1952,14 @@
           label: "39",
           x: 375,
           y: 840,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 375,
@@ -1669,7 +1994,14 @@
           label: "40",
           x: 407,
           y: 825,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 407,
@@ -1704,7 +2036,14 @@
           label: "41",
           x: 510,
           y: 790,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 510,
@@ -1739,7 +2078,14 @@
           label: "42",
           x: 327,
           y: 855,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 327,
@@ -1774,7 +2120,14 @@
           label: "43",
           x: 577,
           y: 770,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 577,
@@ -1809,7 +2162,14 @@
           label: "44",
           x: 110,
           y: 782,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 110,
@@ -1844,7 +2204,14 @@
           label: "45",
           x: 550,
           y: 770,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 550,
@@ -1879,7 +2246,14 @@
           label: "46",
           x: 175,
           y: 872,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 175,
@@ -1914,7 +2288,14 @@
           label: "47",
           x: 597,
           y: 757,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 597,
@@ -1949,7 +2330,14 @@
           label: "48",
           x: 307,
           y: 895,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 307,
@@ -1984,7 +2372,14 @@
           label: "49",
           x: 282,
           y: 835,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 282,
@@ -2019,7 +2414,14 @@
           label: "50",
           x: 687,
           y: 722,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 687,
@@ -2054,7 +2456,14 @@
           label: "51",
           x: 492,
           y: 817,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 492,
@@ -2089,7 +2498,14 @@
           label: "52",
           x: 642,
           y: 752,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 642,
@@ -2124,7 +2540,14 @@
           label: "53",
           x: 730,
           y: 700,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 730,
@@ -2159,7 +2582,14 @@
           label: "54",
           x: 450,
           y: 822,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 450,
@@ -2194,7 +2624,14 @@
           label: "55",
           x: 665,
           y: 737,
-          stages: ["network", "observables", "graph", "distance", "reconstruction", "result"],
+          stages: [
+            "network",
+            "observables",
+            "graph",
+            "distance",
+            "reconstruction",
+            "result",
+          ],
           positions: {
             network: {
               targetX: 665,
@@ -5792,7 +6229,10 @@
       let currentLinks = [];
 
       // Set up SVG with no padding/margins
-      const svg = d3.select("#graph").attr("viewBox", "0 0 800 950").attr("preserveAspectRatio", "none");
+      const svg = d3
+        .select("#graph")
+        .attr("viewBox", "0 0 800 950")
+        .attr("preserveAspectRatio", "none");
 
       // Create groups for links and nodes
       const linkGroup = svg.append("g").attr("class", "links");
@@ -5891,7 +6331,9 @@
 
         // Update link elements with a delay to allow old links to fade out
         setTimeout(() => {
-          linkElements = linkGroup.selectAll(".link").data(currentLinks, (d) => `${d.source}-${d.target}`);
+          linkElements = linkGroup
+            .selectAll(".link")
+            .data(currentLinks, (d) => `${d.source}-${d.target}`);
 
           // Remove old links
           linkElements.exit().remove();
@@ -5969,12 +6411,20 @@
       nodeElements
         .on("mouseenter", function (event, d) {
           if (d.active) {
-            d3.select(this).select(".node").transition().duration(200).attr("r", 14);
+            d3.select(this)
+              .select(".node")
+              .transition()
+              .duration(200)
+              .attr("r", 14);
           }
         })
         .on("mouseleave", function (event, d) {
           if (d.active) {
-            d3.select(this).select(".node").transition().duration(200).attr("r", 10);
+            d3.select(this)
+              .select(".node")
+              .transition()
+              .duration(200)
+              .attr("r", 10);
           }
         });
 
