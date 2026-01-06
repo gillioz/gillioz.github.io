@@ -1,8 +1,7 @@
 ---
 layout: page
 title: Power transmission grids modeling
-description:
-  Realistic modeling for production and consumption in transmission networks
+description: Realistic modeling for production and consumption in transmission networks
 img: assets/img/europe_network.png
 importance: 1
 category: "Power grids"

@@ -26,8 +26,7 @@ body:
         original post.
 
       options:
-        - label:
-            I read through
+        - label: I read through
             [FAQ](https://github.com/alshedivat/al-folio/blob/main/FAQ.md) and
             searched through the [past
             issues](https://github.com/alshedivat/al-folio/issues), none of

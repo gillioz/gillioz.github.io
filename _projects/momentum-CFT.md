@@ -1,8 +1,7 @@
 ---
 layout: page
 title: Conformal field theory in momentum space
-description:
-  Developing a new approach to conformal field theory using the momentum-space
+description: Developing a new approach to conformal field theory using the momentum-space
   representation of correlation functions
 img: assets/img/momenta_t.gif
 importance: 1
