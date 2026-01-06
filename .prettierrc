@@ -1,3 +1,4 @@
 plugins: ["@shopify/prettier-plugin-liquid"]
-printWidth: 150
+printWidth: 80
 trailingComma: "es5"
+proseWrap: "always"

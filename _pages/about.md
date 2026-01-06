@@ -17,11 +17,11 @@ announcements:
   limit: 3 # leave blank to include all the news in the `_news` folder
 ---
 
-I am senior scientist at the <a href='https://www.hevs.ch/'>HES-SO Valais-Wallis</a>, in the town of <a href='https://goo.gl/maps/2KSLcLG25jX94kfU9'>Sion, Switzerland</a>,
-active in the labs of Profs. 
-<a href='https://www.gregorymermoud.ch/'>Grégory Mermoud</a>,
-<a href='https://delabays.xyz/'>Robin Delabays</a>,
-and <a href='https://etranselec.ch/'>Philippe Jacquod</a>.
+I am senior scientist at the [HES-SO Valais-Wallis](https://www.hevs.ch/), in
+the town of [Sion, Switzerland](https://goo.gl/maps/2KSLcLG25jX94kfU9), active
+in the labs of Profs. [Grégory Mermoud](https://www.gregorymermoud.ch/),
+[Robin Delabays](https://delabays.xyz/), and
+[Philippe Jacquod](https://etranselec.ch).
 
 My research interests are mostly in three domains:
 
@@ -29,12 +29,28 @@ My research interests are mostly in three domains:
 - **Machine learning**
 - **High-energy physics**
 
-I'm particularly interested in applying machine learning techniques to solve current problems in power systems, such as power flow optimization through topological changes, or modelling of hydroelectric production.
-A sample of my projects can be found on the [dedicated page](/projects).
+I'm particularly interested in applying machine learning techniques to solve
+current problems in power systems, such as power flow optimization through
+topological changes, or modelling of hydroelectric production. A sample of my
+projects can be found on the [dedicated page](/projects).
 
-My background is in high-energy physics. I got my Ph.D. from the [University of Zurich](https://www.uzh.ch), studying the possibility that the [Higgs boson](https://en.wikipedia.org/wiki/Higgs_boson) is a composite particle. After that I was a postdoc at the [University of Southern Denmark](https://www.linkedin.com/company/cp3-origins-sdu/), at [UC Davis](https://qmap.ucdavis.edu) (USA), at [EPFL](https://www.epfl.ch/labs/lptp/) (Switzerland), and finally at [SISSA](https://www.sissa.it/) (Italy). I became an expert in [conformal field theory](https://en.wikipedia.org/wiki/Conformal_field_theory), a particular case of [quantum field theory](https://en.wikipedia.org/wiki/Quantum_field_theory) with [scale invariance](https://en.wikipedia.org/wiki/Scale_invariance) in which we have a decent and growing understanding of the strong-coupling regime.
+My background is in high-energy physics. I got my Ph.D. from the
+[University of Zurich](https://www.uzh.ch), studying the possibility that the
+[Higgs boson](https://en.wikipedia.org/wiki/Higgs_boson) is a composite
+particle. After that I was a postdoc at the
+[University of Southern Denmark](https://www.linkedin.com/company/cp3-origins-sdu/),
+at [UC Davis](https://qmap.ucdavis.edu) (USA), at
+[EPFL](https://www.epfl.ch/labs/lptp/) (Switzerland), and finally at
+[SISSA](https://www.sissa.it/) (Italy). I became an expert in
+[conformal field theory](https://en.wikipedia.org/wiki/Conformal_field_theory),
+a particular case of
+[quantum field theory](https://en.wikipedia.org/wiki/Quantum_field_theory) with
+[scale invariance](https://en.wikipedia.org/wiki/Scale_invariance) in which we
+have a decent and growing understanding of the strong-coupling regime.
 
-Before joining my current institution, I worked for a while as developer and cloud architect at [SCS](https://www.scs.ch), a software company located in Zurich.
+Before joining my current institution, I worked for a while as developer and
+cloud architect at [SCS](https://www.scs.ch), a software company located in
+Zurich.
 
 <div class="row justify-content-sm-center">
   <a href="https://www.hevs.ch" target="_blank">
