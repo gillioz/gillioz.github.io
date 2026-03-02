@@ -32,7 +32,7 @@ My research interests are mostly in three domains:
 I'm particularly interested in applying machine learning techniques to solve
 current problems in power systems, such as power flow optimization through
 topological changes, or modelling of hydroelectric production. A sample of my
-projects can be found on the [dedicated page](/projects).
+projects can be found on the [dedicated page](/projects/).
 
 My background is in high-energy physics. I got my Ph.D. from the
 [University of Zurich](https://www.uzh.ch), studying the possibility that the
