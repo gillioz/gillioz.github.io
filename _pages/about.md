@@ -19,8 +19,10 @@ announcements:
 
 I am senior scientist at the [HES-SO Valais-Wallis](https://www.hevs.ch/), in
 the town of [Sion, Switzerland](https://goo.gl/maps/2KSLcLG25jX94kfU9), active
-in the labs of Profs. [Grégory Mermoud](https://www.gregorymermoud.ch/),
-[Robin Delabays](https://delabays.xyz/), and
+in the [SIMLab](https://simlab-vs.ch/) of
+Prof. [Grégory Mermoud](https://www.gregorymermoud.ch/),
+as well as with the groups of Profs.
+[Robin Delabays](https://delabays.xyz/) and
 [Philippe Jacquod](https://etranselec.ch).
 
 My research interests are mostly in three domains:
