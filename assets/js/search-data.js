@@ -16,6 +16,13 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/projects/";
           },
+        },{id: "nav-documents",
+          title: "Documents",
+          description: "Public reports, slides of past talks, etc.",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/docs/";
+          },
         },{id: "nav-codes",
           title: "Codes",
           description: "",
@@ -51,6 +58,9 @@ ninja.data = [{
           description: "",
           section: "News",},{id: "news-a-new-preprint-on-anomaly-detection-in-power-grids-is-out-this-is-the-result-of-guillaume-dubuis-master-thesis-defended-some-time-ago",
           title: 'A new preprint on anomaly detection in power grids is out. This is...',
+          description: "",
+          section: "News",},{id: "news-the-slides-of-my-presentation-at-the-midi-création-event-of-the-hes-so-are-available-here-they-can-be-found-like-all-other-slides-on-the-newly-added-documents-page",
+          title: 'The slides of my presentation at the “Midi Création” event of the HES-SO...',
           description: "",
           section: "News",},{id: "projects-deep-learning-morpion-solitaire",
           title: 'Deep learning Morpion Solitaire',
