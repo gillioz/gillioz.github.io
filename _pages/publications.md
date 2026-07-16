@@ -4,7 +4,7 @@ permalink: /publications/
 title: Publications
 description: A list of my publications by categories in reversed chronological order.
 nav: true
-nav_order: 3
+nav_order: 4
 ---
 
 <!-- _pages/publications.md -->
