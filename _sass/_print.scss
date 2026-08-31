@@ -1,0 +1,261 @@
+/*****************************
+ * Print styles
+ *
+ * Used both when a visitor prints a page from the browser, and by the CI
+ * PDF-generation script (bin/generate-pdfs.mjs), which renders pages with
+ * headless Chrome — Chromium's PDF printing always applies @media print.
+ *
+ * Type scale (deliberately spelled out so section headers can never end up
+ * smaller/lighter than the content they contain):
+ *   0.82rem  body text (default)
+ *   0.8rem   entry sub-lines (institution, venue, item bullets)
+ *   0.88rem  entry titles (job/degree/publication titles) — bold
+ *   0.95rem  card section titles (Employment, Skills, ...) — bold, colored
+ *****************************/
+
+@media print {
+  // Always render in light mode on paper, regardless of the viewer's theme.
+  :root,
+  html[data-theme="dark"] {
+    --global-bg-color: #{$white-color};
+    --global-text-color: #{$black-color};
+    --global-text-color-light: #{$grey-color};
+    --global-theme-color: #{$blue-color};
+    --global-card-bg-color: #{$white-color};
+    --global-divider-color: rgba(0, 0, 0, 0.3);
+  }
+
+  body {
+    background: var(--global-bg-color);
+    color: var(--global-text-color);
+    font-size: 0.82rem;
+    line-height: 1.3;
+    // site.navbar_fixed/footer_fixed (_config.yml) reserve top/bottom
+    // padding for the fixed nav and footer bars; both are hidden in print
+    // (see below) but the reserved space isn't, which was tipping content
+    // over the page-height threshold and spilling a near-empty extra page.
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  // Chrome/navigation elements that make no sense on paper. The on-screen
+  // page header (title/description/download buttons) is hidden per-layout
+  // via the d-print-none class instead, in favor of cv/print_header.liquid.
+  #navbar,
+  footer,
+  #back-to-top,
+  #light-toggle,
+  .navbar-brand.social,
+  #toc-sidebar {
+    display: none !important;
+  }
+
+  // The sidebar TOC (see _layouts/default.liquid) leaves an empty column
+  // behind once it's hidden — let the main content take the full width.
+  .row:has(#toc-sidebar) > .col-sm-9 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .container.mt-5 {
+    margin-top: 0.25rem !important;
+  }
+
+  .post {
+    margin-top: 0;
+  }
+
+  // Print-only CV masthead (name / label / tagline / contact line), see
+  // _includes/cv/print_header.liquid.
+  .cv-print-header {
+    margin-bottom: 1.1rem;
+
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .cv-print-label {
+      margin: 0.15rem 0 0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--global-theme-color) !important;
+    }
+
+    .cv-print-tagline {
+      margin: 0.3rem 0 0;
+      font-size: 1rem;
+      color: var(--global-text-color-light) !important;
+    }
+
+    .cv-print-contact {
+      margin: 0.4rem 0 0;
+      font-size: 0.85rem;
+
+      span + span::before {
+        content: " · ";
+      }
+
+      a {
+        text-decoration: underline !important;
+      }
+    }
+  }
+
+  // Two-column page layout: a narrow sidebar (Skills/Languages/Certificates
+  // — short, list-like content) beside a wide main column (Employment/
+  // Education/Publications — content with its own internal date/location
+  // sub-column, which needs the width). The two columns are separate DOM
+  // containers (see _layouts/cv.liquid and _layouts/cv-academic.liquid) —
+  // NOT a shared float/grid on interleaved cards — so each flows to its
+  // own height independently, regardless of how tall the other column is.
+  .cv.d-print-flex {
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  // On the (single-page) resume, the sidebar is stretched to match the
+  // main column's height and its cards spread out to actually fill that
+  // height, rather than leaving a blank gap below shorter content. The
+  // academic CV deliberately does NOT do this: Skills/Languages must land
+  // on page 1 alongside Employment, and stretching them across the full
+  // multi-page height of Employment/Education/Publications is what was
+  // pushing them onto a later page instead.
+  .cv-print-resume.d-print-flex {
+    align-items: stretch;
+  }
+
+  .cv-print-resume .cv-col-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  // Anchor targets between cards would otherwise count as extra (empty)
+  // flex items, throwing off the space-between distribution above.
+  .cv-col-side > a.anchor,
+  .cv-col-main > a.anchor {
+    display: none;
+  }
+
+  // Main column (Employment/Education/Publications) reads first, on the
+  // left; the sidebar (Skills/Languages/Certificates) sits on the right.
+  .cv-col-main {
+    order: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .cv-col-side {
+    order: 2;
+    flex: 0 0 31%;
+  }
+
+  // The skills/languages list_groups normally lay out two sub-columns
+  // side by side (see _includes/cv/list_groups.liquid) — far too narrow
+  // to also fit inside the sidebar, so stack them single-file there, with
+  // extra breathing room between groups and between individual items.
+  .cv-col-side .list-group {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 1.4rem;
+  }
+
+  .cv-col-side td.list-group-name {
+    padding-bottom: 0.2rem;
+    white-space: nowrap;
+  }
+
+  // Cards become plain sections, separated by whitespace and a section
+  // title instead of a bordered box — but the title needs to unambiguously
+  // outrank everything inside it, which the theme's default h3 (a light
+  // display face) does not against bold entry titles, hence the explicit
+  // weight/size/color/rule below.
+  .cv .card {
+    margin-top: 0.9rem !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  .cv-col-side .card:first-of-type,
+  .cv-col-main .card:first-of-type {
+    margin-top: 0 !important;
+  }
+
+  .cv .card-title {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.15rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--global-theme-color) !important;
+    border-bottom: 1.5px solid var(--global-theme-color);
+  }
+
+  .cv h6.title {
+    font-size: 0.88rem;
+  }
+
+  .cv .list-group-item {
+    padding: 0.2rem 0.5rem;
+  }
+
+  .cv table.table-cv.institution {
+    margin-bottom: 0.2rem;
+  }
+
+  // Skills/Languages category groups (see _includes/cv/list_groups.liquid):
+  // the theme's default 2rem gap between groups reads as loose/uneven next
+  // to the rest of the tightened print layout.
+  .cv .list-group {
+    margin-bottom: 0.9rem;
+  }
+
+  .cv td.list-group-category {
+    font-weight: 600;
+    padding-bottom: 0.15rem;
+  }
+
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  // Web-style bordered buttons (DOI/arXiv/Code/Website links, and the
+  // linkitems on the academic CV's employment/education entries) read as
+  // app UI on paper — flatten them into compact inline text links.
+  .cv .btncv,
+  .cv a.btn {
+    display: inline !important;
+    border: none !important;
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 0.75rem 0 0 !important;
+    text-transform: none !important;
+    font-size: 0.78rem !important;
+    color: var(--global-text-color-light) !important;
+    text-decoration: underline !important;
+  }
+
+  .cv .container-pdf,
+  .cv .links {
+    margin-top: 0.15rem;
+  }
+
+  @page {
+    size: A4;
+    margin: 1.5cm;
+  }
+}

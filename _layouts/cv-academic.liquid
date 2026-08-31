@@ -1,0 +1,59 @@
+---
+layout: default
+---
+<div class="post">
+  {% include cv/print_header.liquid show_orcid=true %}
+  <header class="post-header d-print-none">
+    <h1 class="post-title">
+      {{ page.title }}
+      {% if page.cv_pdf %}
+        <a
+          {% if page.cv_pdf contains '://' %}
+            href="{{ page.cv_pdf }}"
+          {% else %}
+            href="{{ page.cv_pdf | prepend: 'assets/pdf/' | relative_url }}"
+          {% endif %}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="float-right"
+        >
+          <i class="fa-solid fa-file-pdf"></i>
+        </a>
+      {% endif %}
+    </h1>
+    {% if page.description %}
+      <p class="post-description">{{ page.description }}</p>
+    {% endif %}
+  </header>
+
+  <article>
+    {% assign cv_sidebar_sections = 'Skills,Languages' | split: ',' %}
+
+    <!-- Single-column layout, shown on screen -->
+    <div class="cv d-print-none">
+      {% for entry in site.data.cv_academic %}
+        {% include cv/_card.liquid %}
+      {% endfor %}
+    </div>
+
+    <!--
+      Two-column layout, shown only when printing: a narrow sidebar for
+      Skills/Languages alongside a wide main column for the sections with
+      their own date/location sub-layout — see _sass/_print.scss.
+    -->
+    <div class="cv d-none d-print-flex cv-print-academic">
+      <div class="cv-col-side">
+        {% for entry in site.data.cv_academic %}
+          {% unless cv_sidebar_sections contains entry.title %} {% continue %} {% endunless %}
+          {% include cv/_card.liquid %}
+        {% endfor %}
+      </div>
+      <div class="cv-col-main">
+        {% for entry in site.data.cv_academic %}
+          {% if cv_sidebar_sections contains entry.title %} {% continue %} {% endif %}
+          {% include cv/_card.liquid %}
+        {% endfor %}
+      </div>
+    </div>
+  </article>
+</div>

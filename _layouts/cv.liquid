@@ -3,26 +3,32 @@ layout: default
 ---
 {% unless site.data.resume %}
   <div class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        {{ page.title }}
-        {% if page.cv_pdf %}
-          <a
-            {% if page.cv_pdf contains '://' %}
-              href="{{ page.cv_pdf }}"
-            {% else %}
-              href="{{ page.cv_pdf | prepend: 'assets/pdf/' | relative_url }}"
-            {% endif %}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="float-right"
-          >
-            <i class="fa-solid fa-file-pdf"></i>
-          </a>
-        {% endif %}
-      </h1>
+    {% include cv/print_header.liquid %}
+    <header class="post-header d-print-none">
+      <h1 class="post-title">{{ page.title }}</h1>
       {% if page.description %}
         <p class="post-description">{{ page.description }}</p>
+      {% endif %}
+      {% if page.cv_pdfs %}
+        <div class="container-pdf">
+          {% for pdf in page.cv_pdfs %}
+            <div class="container-link-button">
+              <a
+                {% if pdf.file contains '://' %}
+                  href="{{ pdf.file }}"
+                {% else %}
+                  href="{{ pdf.file | prepend: 'assets/pdf/' | relative_url }}"
+                {% endif %}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btncv z-depth-0"
+              >
+                <i class="fa-solid fa-file-pdf"></i>
+                {{ pdf.label }}
+              </a>
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
     </header>
 
@@ -54,73 +60,87 @@ layout: default
   </div>
 {% else %}
   <div class="post">
-    <header class="post-header">
-      <h1 class="post-title">
-        {{ page.title }}
-        {% if page.cv_pdf %}
-          <a
-            {% if page.cv_pdf contains '://' %}
-              href="{{ page.cv_pdf }}"
-            {% else %}
-              href="{{ page.cv_pdf | prepend: 'assets/pdf/' | relative_url }}"
-            {% endif %}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="float-right"
-          >
-            <i class="fa-solid fa-file-pdf"></i>
-          </a>
-        {% endif %}
-      </h1>
+    {% include cv/print_header.liquid %}
+    <header class="post-header d-print-none">
+      <h1 class="post-title">{{ page.title }}</h1>
       {% if page.description %}
         <p class="post-description">{{ page.description }}</p>
+      {% endif %}
+      {% if page.cv_pdfs %}
+        <div class="container-pdf">
+          {% for pdf in page.cv_pdfs %}
+            <div class="container-link-button">
+              <a
+                {% if pdf.file contains '://' %}
+                  href="{{ pdf.file }}"
+                {% else %}
+                  href="{{ pdf.file | prepend: 'assets/pdf/' | relative_url }}"
+                {% endif %}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btncv z-depth-0"
+              >
+                <i class="fa-solid fa-file-pdf"></i>
+                {{ pdf.label }}
+              </a>
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
     </header>
 
     <article>
-      <div class="cv">
+      {% assign cv_sidebar_sections = 'certificates,skills,languages' | split: ',' %}
+
+      <!-- Single-column layout, shown on screen -->
+      <div class="cv d-print-none">
         {% for data in site.data.resume %}
           {% if site.jsonresume and site.jsonresume.size > 0 %}
             {% unless site.jsonresume contains data[0] %}
               {% continue %}
             {% endunless %}
           {% endif %}
-          {% if data[0] == 'meta' or data[1].size == 0 %} {% continue %} {% endif %}
-          <a class="anchor" id="{{ data[0] }}"></a>
-          <div class="card mt-3 p-3">
-            <h3 class="card-title font-weight-medium">{{ data[0] | capitalize }}</h3>
-            <div>
-              {% case data[0] %}
-                {% when 'basics' %}
-                  {% include resume/basics.liquid %}
-                {% when 'education' %}
-                  {% include resume/education.liquid %}
-                {% when 'work' %}
-                  {% include resume/work.liquid %}
-                {% when 'volunteer' %}
-                  {% include resume/volunteer.liquid %}
-                {% when 'projects' %}
-                  {% include resume/projects.liquid %}
-                {% when 'awards' %}
-                  {% include resume/awards.liquid %}
-                {% when 'skills' %}
-                  {% include resume/skills.liquid %}
-                {% when 'publications' %}
-                  {% include resume/publications.liquid %}
-                {% when 'languages' %}
-                  {% include resume/languages.liquid %}
-                {% when 'interests' %}
-                  {% include resume/interests.liquid %}
-                {% when 'certificates' %}
-                  {% include resume/certificates.liquid %}
-                {% when 'references' %}
-                  {% include resume/references.liquid %}
-                {% else %}
-
-              {% endcase %}
-            </div>
-          </div>
+          {% if data[0] == 'meta' %} {% continue %} {% endif %}
+          {% if data[0] != 'publications' and data[1].size == 0 %} {% continue %} {% endif %}
+          {% include resume/_card.liquid %}
         {% endfor %}
+      </div>
+
+      <!--
+        Two-column layout, shown only when printing: a narrow sidebar for
+        short list-like sections (Certificates/Skills/Languages) alongside a
+        wide main column for sections with their own date/location
+        sub-layout (Work/Education/Publications) — see _sass/_print.scss.
+      -->
+      <div class="cv d-none d-print-flex cv-print-resume">
+        <div class="cv-col-side">
+          {% assign cv_sidebar_order = 'skills,certificates,languages' | split: ',' %}
+          {% for wanted_key in cv_sidebar_order %}
+            {% for data in site.data.resume %}
+              {% unless data[0] == wanted_key %} {% continue %} {% endunless %}
+              {% if site.jsonresume and site.jsonresume.size > 0 %}
+                {% unless site.jsonresume contains data[0] %}
+                  {% continue %}
+                {% endunless %}
+              {% endif %}
+              {% if data[1].size == 0 %} {% continue %} {% endif %}
+              {% include resume/_card.liquid %}
+            {% endfor %}
+          {% endfor %}
+        </div>
+        <div class="cv-col-main">
+          {% for data in site.data.resume %}
+            {% if site.jsonresume and site.jsonresume.size > 0 %}
+              {% unless site.jsonresume contains data[0] %}
+                {% continue %}
+              {% endunless %}
+            {% endif %}
+            {% if data[0] == 'meta' or data[0] == 'basics' %} {% continue %} {% endif %}
+            {% if data[0] != 'publications' and data[1].size == 0 %} {% continue %} {% endif %}
+            {% if cv_sidebar_sections contains data[0] %} {% continue %} {% endif %}
+            {% include resume/_card.liquid %}
+          {% endfor %}
+        </div>
       </div>
     </article>
   </div>

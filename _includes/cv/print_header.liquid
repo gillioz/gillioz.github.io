@@ -1,0 +1,40 @@
+<div class="d-none d-print-block cv-print-header">
+  <h1>
+    {{ site.first_name }}
+    {{ site.last_name }}
+  </h1>
+  {% if page.print_label %}
+    <p class="cv-print-label">{{ page.print_label }}</p>
+  {% endif %}
+  {% if site.data.resume.basics.summary %}
+    <p class="cv-print-tagline">{{ site.data.resume.basics.summary }}</p>
+  {% endif %}
+  <p class="cv-print-contact">
+    {% if site.data.resume.basics.location.city %}
+      <span>
+        {{- site.data.resume.basics.location.city -}}
+        {%- if site.data.resume.basics.location.countryCode -%}
+          , {{ site.data.resume.basics.location.countryCode }}
+        {%- endif -%}
+      </span>
+    {% endif %}
+    {% if site.url %}
+      <span
+        ><a href="{{ site.url }}" target="_blank">{{ site.url | remove_first: 'https://' | remove_first: 'http://' }}</a></span
+      >
+    {% endif %}
+    {% if site.data.socials.email %}
+      <span
+        ><a href="mailto:{{ site.data.socials.email }}">{{ site.data.socials.email }}</a></span
+      >
+    {% endif %}
+    {% if site.data.socials.linkedin_username %}
+      <span>
+        <a href="https://www.linkedin.com/in/{{ site.data.socials.linkedin_username }}" target="_blank">LinkedIn</a>
+      </span>
+    {% endif %}
+    {% if include.show_orcid and site.data.socials.orcid_id %}
+      <span><a href="https://orcid.org/{{ site.data.socials.orcid_id }}" target="_blank">ORCID</a></span>
+    {% endif %}
+  </p>
+</div>

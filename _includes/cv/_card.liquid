@@ -1,0 +1,27 @@
+{% comment %}
+  Renders one academic-CV section card. Expects `entry` (one item from
+  site.data.cv_academic) to be set by the caller. Factored out so the print
+  layout's two columns (see _layouts/cv-academic.liquid) can render the same
+  card markup from two separate loops without duplicating the type dispatch.
+{% endcomment %}
+<a class="anchor" id="{{ entry.title }}"></a>
+<div class="card mt-3 p-3">
+  <h3 class="card-title font-weight-medium">{{ entry.title }}</h3>
+  <div>
+    {% if entry.type == 'list' %}
+      {% include cv/list.liquid %}
+    {% elsif entry.type == 'map' %}
+      {% include cv/map.liquid %}
+    {% elsif entry.type == 'nested_list' %}
+      {% include cv/nested_list.liquid %}
+    {% elsif entry.type == 'time_table' %}
+      {% include cv/time_table.liquid %}
+    {% elsif entry.type == 'list_groups' %}
+      {% include cv/list_groups.liquid %}
+    {% elsif entry.type == 'publications' %}
+      {% include cv/publications_full.liquid %}
+    {% else %}
+      {{ entry.contents }}
+    {% endif %}
+  </div>
+</div>

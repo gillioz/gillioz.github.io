@@ -1,0 +1,182 @@
+# Data for the /cv/academic/ page (academic CV), rendered by
+# _layouts/cv-academic.liquid. Each top-level item is a "card" section.
+#
+# Supported `type` values (see _includes/cv/*.liquid for the exact schema
+# each one expects):
+#   time_table   - dated entries with institution/department/items/linkitems
+#   list         - a flat bullet list of strings
+#   nested_list  - grouped bullet lists with a title per group
+#   list_groups  - multi-column grouped items (used here for skills/languages)
+#   publications - special case: ignores `contents`, renders the full,
+#                  auto-generated list from site.data.cv_publications
+#                  (kept in sync with _bibliography/papers.bib automatically)
+
+- title: Employment
+  type: time_table
+  contents:
+    - year: 2023–
+      title: Senior Academic Associate
+      institution: HES-SO Valais-Wallis, School of Engineering
+      department: Electrical Energy Efficiency Group
+      location: Sion, Switzerland
+      items:
+        - Power systems
+        - Machine learning
+        - Optimization
+      linkitems:
+        - link: https://etranselec.ch/
+          linkname: Website
+    - year: 2022–2023
+      title: Development Engineer
+      institution: Supercomputing Systems AG
+      location: Zurich, Switzerland
+      items:
+        - C#/.NET
+        - Terraform
+        - Azure cloud
+      linkitems:
+        - link: https://www.scs.ch/
+          linkname: Website
+    - year: 2019–2022
+      title: Postdoctoral Researcher
+      institution: SISSA
+      department: Theoretical Particle Physics
+      location: Trieste, Italy
+      linkitems:
+        - link: https://www.sissa.it/tpp/
+          linkname: Website
+    - year: 2016–2019
+      title: Postdoctoral Researcher
+      institution: EPFL
+      department: Theoretical Particle Physics Laboratory
+      location: Lausanne, Switzerland
+      linkitems:
+        - link: https://www.epfl.ch/labs/lptp
+          linkname: Website
+    - year: 2014–2016
+      title: Postdoctoral Researcher
+      institution: UC Davis
+      department: QMAP
+      location: Davis, CA, USA
+      linkitems:
+        - link: https://qmap.ucdavis.edu/
+          linkname: Website
+    - year: 2012–2014
+      title: Postdoctoral Researcher
+      institution: University of Southern Denmark
+      department: CP3-Origins
+      location: Odense, Denmark
+      linkitems:
+        - link: https://www.linkedin.com/company/cp3-origins-sdu/
+          linkname: Website
+
+- title: Education
+  type: time_table
+  contents:
+    - year: 2008–2012
+      title: Ph.D. in Theoretical Physics
+      institution: University of Zurich
+      location: Zurich, Switzerland
+      linkitems:
+        - link: https://www.uzh.ch/
+          linkname: Website
+    - year: 2003–2008
+      title: M.Sc. in Physics
+      institution: EPFL
+      location: Lausanne, Switzerland
+      linkitems:
+        - link: https://www.epfl.ch/
+          linkname: Website
+    - year: 2005
+      title: Erasmus Exchange Year, Physics
+      institution: Imperial College
+      location: London, UK
+      linkitems:
+        - link: https://www.imperial.ac.uk/
+          linkname: Website
+
+- title: Publications
+  type: publications
+
+- title: Skills
+  type: list_groups
+  contents:
+    - category: Code
+      icon: fa-solid fa-code
+      items:
+        - name: Python
+        - name: C++
+        - name: C# / .NET
+    - category: Software engineering
+      icon: fa-brands fa-linux
+      items:
+        - name: Linux systems
+        - name: DevOps
+        - name: Cluster computing
+    - category: Scientific computing
+      icon: fa-solid fa-computer
+      items:
+        - name: Polars dataframes
+        - name: Optimization
+        - name: Computer algebra
+    - category: Machine learning
+      icon: fa-solid fa-database
+      items:
+        - name: JAX
+        - name: PyTorch
+        - name: scikit-learn
+    - category: Physics
+      icon: fa-solid fa-atom
+      items:
+        - name: Quantum field theory
+        - name: Particle physics
+        - name: Complex networks
+    - category: Electrical engineering
+      icon: fa-solid fa-bolt
+      items:
+        - name: Power grids
+
+- title: Languages
+  type: list_groups
+  contents:
+    - category: Spoken languages
+      icon: fa-solid fa-comments
+      items:
+        - name: French
+          level: Native speaker
+        - name: English
+          level: Fluent
+        - name: German
+          level: Fluent
+        - name: Italian
+          level: Intermediate
+        - name: Danish
+          level: Basic
+# The sections below are intentionally left out of the published CV because
+# I don't have real content for them yet — uncomment and fill in for real
+# once you have data, rather than publishing placeholder text. Suggested
+# shapes, matching the schemas above:
+#
+# - title: Awards & Honours
+#   type: time_table
+#   contents:
+#     - year: "20XX"
+#       title: Award name
+#       institution: Awarding body
+#
+# - title: Teaching
+#   type: time_table
+#   contents:
+#     - year: "20XX"
+#       title: Course name (role, e.g. Lecturer / TA)
+#       institution: University
+#
+# - title: Service
+#   type: nested_list
+#   contents:
+#     - title: Peer review
+#       items:
+#         - "Referee for <Journal>"
+#     - title: Organizing committees
+#       items:
+#         - "<Conference/workshop>, <year>"

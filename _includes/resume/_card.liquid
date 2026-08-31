@@ -1,0 +1,46 @@
+{% comment %}
+  Renders one resume section card. Expects `data` (a [key, value] pair from
+  site.data.resume) and `cv_col_class` to be set by the caller. Factored out
+  so /cv/'s two print columns (see _layouts/cv.liquid) can render the same
+  card markup from two separate loops without duplicating the section list.
+{% endcomment %}
+<a class="anchor" id="{{ data[0] }}"></a>
+<div class="card mt-3 p-3{% if data[0] == 'basics' %} d-print-none{% endif %}">
+  <h3 class="card-title font-weight-medium">
+    {% if data[0] == 'publications' %}
+      Selected Publications
+    {% else %}
+      {{ data[0] | capitalize }}
+    {% endif %}
+  </h3>
+  <div>
+    {% case data[0] %}
+      {% when 'basics' %}
+        {% include resume/basics.liquid %}
+      {% when 'education' %}
+        {% include resume/education.liquid %}
+      {% when 'work' %}
+        {% include resume/work.liquid %}
+      {% when 'volunteer' %}
+        {% include resume/volunteer.liquid %}
+      {% when 'projects' %}
+        {% include resume/projects.liquid %}
+      {% when 'awards' %}
+        {% include resume/awards.liquid %}
+      {% when 'skills' %}
+        {% include resume/skills.liquid %}
+      {% when 'publications' %}
+        {% include resume/publications.liquid %}
+      {% when 'languages' %}
+        {% include resume/languages.liquid %}
+      {% when 'interests' %}
+        {% include resume/interests.liquid %}
+      {% when 'certificates' %}
+        {% include resume/certificates.liquid %}
+      {% when 'references' %}
+        {% include resume/references.liquid %}
+      {% else %}
+
+    {% endcase %}
+  </div>
+</div>

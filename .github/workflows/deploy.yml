@@ -11,9 +11,13 @@ on:
       - "**.bib"
       - "**.html"
       - "**.js"
+      - "**.mjs"
       - "**.liquid"
       - "**/*.md"
       - "**.yml"
+      - "**.rb"
+      - "package.json"
+      - "package-lock.json"
       - "Gemfile"
       - "Gemfile.lock"
       - "!.github/workflows/axe.yml"
@@ -39,9 +43,13 @@ on:
       - "**.bib"
       - "**.html"
       - "**.js"
+      - "**.mjs"
       - "**.liquid"
       - "**/*.md"
       - "**.yml"
+      - "**.rb"
+      - "package.json"
+      - "package-lock.json"
       - "Gemfile"
       - "Gemfile.lock"
       - "!.github/workflows/axe.yml"
@@ -92,6 +100,16 @@ jobs:
           pip3 install --upgrade nbconvert
           export JEKYLL_ENV=production
           bundle exec jekyll build
+      - name: Setup Node.js ⚙️
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: "npm"
+      - name: Generate CV PDFs 📄
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          node bin/generate-pdfs.mjs
       - name: Purge unused CSS 🧹
         run: |
           npm install -g purgecss
