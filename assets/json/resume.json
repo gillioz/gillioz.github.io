@@ -50,7 +50,7 @@
       "name": "SISSA",
       "location": "Trieste, Italy",
       "position": "Postdoctoral researcher",
-      "url": "https://www.sissa.it/",
+      "url": "https://www.sissa.it/tpp/",
       "startDate": "2019-07",
       "endDate": "2022-05",
       "highlights": ["Conformal field theory", "Mathematical physics"]
@@ -109,6 +109,7 @@
       "endDate": "2005"
     }
   ],
+  "publications": [],
   "certificates": [
     {
       "name": "Microsoft Azure Administrator Associate",
@@ -120,24 +121,29 @@
   ],
   "skills": [
     {
-      "name": "Software",
+      "name": "Code",
       "icon": "fa-solid fa-code",
-      "keywords": ["C# / .NET", "C++", "Python", "DevOps"]
+      "keywords": ["Python", "C++", "C# / .NET"]
+    },
+    {
+      "name": "Software engineering",
+      "icon": "fa-brands fa-linux",
+      "keywords": ["Linux systems", "DevOps", "Cluster computing"]
     },
     {
       "name": "Scientific computing",
       "icon": "fa-solid fa-computer",
-      "keywords": ["Julia", "Mathematica"]
+      "keywords": ["Polars dataframes", "Julia, Mathematica", "Computer algebra"]
     },
     {
       "name": "Machine learning",
       "icon": "fa-solid fa-database",
-      "keywords": ["PyTorch", "scikit-learn"]
+      "keywords": ["JAX", "PyTorch", "scikit-learn"]
     },
     {
       "name": "Physics",
       "icon": "fa-solid fa-atom",
-      "keywords": ["Quantum field theory", "Particle physics"]
+      "keywords": ["Quantum field theory", "Particle physics", "Complex networks"]
     },
     {
       "name": "Electrical engineering",
