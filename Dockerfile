@@ -1,11 +1,9 @@
 FROM ruby:slim
 
-# uncomment these if you are having this issue with the build:
-# /usr/local/bundle/gems/jekyll-4.3.4/lib/jekyll/site.rb:509:in `initialize': Permission denied @ rb_sysopen - /srv/jekyll/.jekyll-cache/.gitignore (Errno::EACCES)
-# ARG GROUPID=901
-# ARG GROUPNAME=ruby
-# ARG USERID=901
-# ARG USERNAME=jekyll
+ARG GROUPID=901
+ARG GROUPNAME=ruby
+ARG USERID=901
+ARG USERNAME=jekyll
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -13,11 +11,10 @@ LABEL authors="Amir Pourmand,George Araújo" \
       description="Docker image for al-folio academic template" \
       maintainer="Amir Pourmand"
 
-# uncomment these if you are having this issue with the build:
-# /usr/local/bundle/gems/jekyll-4.3.4/lib/jekyll/site.rb:509:in `initialize': Permission denied @ rb_sysopen - /srv/jekyll/.jekyll-cache/.gitignore (Errno::EACCES)
-# add a non-root user to the image with a specific group and user id to avoid permission issues
-# RUN groupadd -r $GROUPNAME -g $GROUPID && \
-#     useradd -u $USERID -m -g $GROUPNAME $USERNAME
+# add a non-root user to the image with a specific group and user id to avoid
+# permission issues on the bind-mounted project directory
+RUN groupadd -r $GROUPNAME -g $GROUPID && \
+    useradd -u $USERID -m -g $GROUPNAME $USERNAME
 
 # install system dependencies
 RUN apt-get update -y && \
@@ -51,10 +48,12 @@ ENV EXECJS_RUNTIME=Node \
     LC_ALL=en_US.UTF-8
 
 # create a directory for the jekyll site
-RUN mkdir /srv/jekyll
+RUN mkdir /srv/jekyll && chown $USERNAME:$GROUPNAME /srv/jekyll
 
-# copy the Gemfile and Gemfile.lock to the image
-ADD Gemfile.lock /srv/jekyll
+# copy the Gemfile to the image (Gemfile.lock is intentionally not
+# committed to git, see manage_gemfile_lock() in bin/entry_point.sh, so it
+# isn't guaranteed to exist in the build context; `bundle install` below
+# generates one from the Gemfile alone if needed)
 ADD Gemfile /srv/jekyll
 
 # set the working directory
@@ -64,13 +63,18 @@ WORKDIR /srv/jekyll
 RUN gem install --no-document jekyll bundler
 RUN bundle install --no-cache
 
+# entry_point.sh runs `bundle install` again at container start (see
+# bin/entry_point.sh) as the non-root user below, so it needs write access
+# to the gem directory, not just read access.
+RUN chown -R $USERNAME:$GROUPNAME /usr/local/bundle
+
 EXPOSE 8080
 
-COPY bin/entry_point.sh /tmp/entry_point.sh
+COPY --chown=$USERNAME:$GROUPNAME bin/entry_point.sh /tmp/entry_point.sh
 
-# uncomment this if you are having this issue with the build:
-# /usr/local/bundle/gems/jekyll-4.3.4/lib/jekyll/site.rb:509:in `initialize': Permission denied @ rb_sysopen - /srv/jekyll/.jekyll-cache/.gitignore (Errno::EACCES)
-# set the ownership of the jekyll site directory to the non-root user
-# USER $USERNAME
+# run as the non-root user created above, so files written back to the
+# bind-mounted project directory (Gemfile.lock, .jekyll-cache, _site, ...)
+# are owned by the host user instead of root
+USER $USERNAME
 
 CMD ["/tmp/entry_point.sh"]
